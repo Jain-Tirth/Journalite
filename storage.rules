@@ -1,0 +1,19 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow users to upload and manage their own journal images
+    match /journal/{userId}/{entryId}/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow users to upload and manage their own profile images
+    match /profiles/{userId}/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow public read access to certain files (if needed)
+    match /public/{allPaths=**} {
+      allow read;
+    }
+  }
+}

@@ -1,0 +1,15 @@
+# Core requirements for Cloud Run deployment
+flask==2.3.3
+flask-cors==4.0.0
+python-dotenv==1.0.0
+gunicorn==21.2.0
+requests==2.31.0
+
+# Analytics dependencies
+textblob==0.17.1
+
+# Optional: Add these back if you need advanced features
+# google-generativeai==0.1.0
+# firebase-admin==6.2.0
+# pandas==2.1.1
+# numpy==1.24.3
