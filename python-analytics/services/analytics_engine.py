@@ -3,7 +3,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from collections import Counter, defaultdict
 import re
-from wordcloud import WordCloud
+from wordcloud import Wordcloud
 import matplotlib.pyplot as plt
 import seaborn as sns
 from textblob import TextBlob
@@ -12,20 +12,15 @@ import plotly.express as px
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import logging
+import nltk
+nltk.download('stopwords')
 
 logger = logging.getLogger(__name__)
 
 class AnalyticsEngine:
     def __init__(self):
-        self.stop_words = set([
-            'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
-            'is', 'was', 'are', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did',
-            'will', 'would', 'could', 'should', 'may', 'might', 'can', 'this', 'that', 'these',
-            'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them',
-            'my', 'your', 'his', 'her', 'its', 'our', 'their', 'myself', 'yourself', 'himself',
-            'herself', 'itself', 'ourselves', 'yourselves', 'themselves'
-        ])
-        
+      self.stop_words = set(nltk.corpus.stopwords.words('english'))
+  
     def initialize_models(self):
         """Initialize any ML models needed for analytics"""
         logger.info("Analytics engine models initialized")
