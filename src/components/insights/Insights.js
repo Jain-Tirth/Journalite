@@ -10,6 +10,7 @@ import EmotionsOverTime from './EmotionsOverTime';
 import WordCloud from './WordCloud';
 import WritingPatterns from './WritingPatterns';
 import MoodCorrelations from './MoodCorrelations';
+import {fieldEncryptionService} from '../../services/fieldEncryption';
 
 const Insights = () => {
   const { currentUser } = useAuth();
@@ -60,6 +61,7 @@ const Insights = () => {
         setEntries(response.data);
 
         if (response.data.length > 0) {
+          console.log(response.data.length);
           await performAIAnalysis(response.data);
         } else {
           setError('No journal entries found. Start writing to see insights!');
@@ -98,21 +100,55 @@ const Insights = () => {
           setInsights(result.insights);
           setLastAnalyzed(new Date());
           return;
-        } else {
-          // Python analytics failed, fallback to JS AI.
         }
       }
       // Prepare data for analysis
-      const analysisData = entriesData.map(entry => ({
-        id: entry.id,
-        content: entry.content,
-        title: entry.title,
-        mood: entry.mood,
-        createdAt: entry.createdAt,
-        tags: entry.tags || []
-      }));
+      console.log('🔍 Preparing analysis data...');
+      console.log('Raw entries count:', entriesData.length);
+      
+      const analysisData = entriesData.map((entry, index) => {
+        try {
+          const decryptedEntry = fieldEncryptionService.decryptJournalEntry(entry, currentUser.uid);
+          
+          const prepared = {
+            id: entry.id,
+            title: decryptedEntry.title || '',
+            content: decryptedEntry.content || '',
+            mood: entry.mood,
+            createdAt: entry.createdAt,
+            tags: entry.tags || []
+          };
+          
+          // Debug log for first few entries
+          if (index < 3) {
+            console.log(`Entry ${index + 1}:`, {
+              id: prepared.id,
+              titleLength: prepared.title?.length || 0,
+              contentLength: prepared.content?.length || 0,
+              titleType: typeof prepared.title,
+              contentType: typeof prepared.content
+            });
+          }
+          
+          return prepared;
+        } catch (decryptError) {
+          console.error(`❌ Failed to decrypt entry ${entry.id}:`, decryptError);
+          return {
+            id: entry.id,
+            title: '[Decryption Failed]',
+            content: '[Decryption Failed]',
+            mood: entry.mood,
+            createdAt: entry.createdAt,
+            tags: entry.tags || []
+          };
+        }
+      });
+      
+      console.log('✅ Analysis data prepared:', analysisData.length, 'entries');
+      console.log('📤 Sending to AI services...');
 
       // Generate AI-powered analytics
+      console.log('🤖 Starting AI analysis...');
       const [
         emotionDistributionResult,
         wordCloudResult,
@@ -121,8 +157,18 @@ const Insights = () => {
         sentimentAnalysis,
         writingPatterns
       ] = await Promise.all([
-        aiMoodAnalysisService.analyzeEmotionDistribution(analysisData),
-        aiMoodAnalysisService.generateIntelligentWordCloud(analysisData),
+        (async () => {
+          console.log('📊 Calling analyzeEmotionDistribution...');
+          const result = await aiMoodAnalysisService.analyzeEmotionDistribution(analysisData);
+          console.log('📊 Emotion distribution result:', result);
+          return result;
+        })(),
+        (async () => {
+          console.log('☁️ Calling generateIntelligentWordCloud...');
+          const result = await aiMoodAnalysisService.generateIntelligentWordCloud(analysisData);
+          console.log('☁️ Word cloud result:', result);
+          return result;
+        })(),
         generateEmotionsOverTime(analysisData),
         generateMoodCorrelations(analysisData),
         generateAISentimentAnalysis(analysisData),

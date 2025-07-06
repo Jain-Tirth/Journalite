@@ -135,16 +135,37 @@ def simple_analytics(entries):
     if not entries:
         return {}
 
+    # Debug logging
+    logger.info(f"📊 Processing {len(entries)} entries for analytics")
+    if entries:
+        sample_entry = entries[0]
+        logger.info(f"Sample entry: {sample_entry}")
+        logger.info(f"Content type: {type(sample_entry.get('content'))}")
+        logger.info(f"Content value: {repr(sample_entry.get('content'))}")
+
     # Count moods
     mood_counts = {}
     total_words = 0
 
-    for entry in entries:
-        content = entry.get('content', '')
-        mood = entry.get('mood', 'neutral')
+    for i, entry in enumerate(entries):
+        try:
+            content = entry.get('content', '')
+            mood = entry.get('mood', 'neutral')
+            
+            # Ensure content is string
+            if not isinstance(content, str):
+                logger.warning(f"Entry {i}: content is {type(content)}, converting to string")
+                content = str(content) if content is not None else ''
 
-        mood_counts[mood] = mood_counts.get(mood, 0) + 1
-        total_words += len(content.split())
+            mood_counts[mood] = mood_counts.get(mood, 0) + 1
+            
+            if content:
+                total_words += len(content.split())
+                
+        except Exception as e:
+            logger.error(f"Error processing entry {i}: {e}")
+            logger.error(f"Entry data: {entry}")
+            continue
 
     # Create emotion distribution
     total_entries = len(entries)

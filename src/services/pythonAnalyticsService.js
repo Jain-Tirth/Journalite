@@ -238,15 +238,41 @@ class PythonAnalyticsService {
    * Format entries for Python backend
    */
   formatEntriesForPython(entries) {
-    return entries.map(entry => ({
-      id: entry.id,
-      content: entry.content || '',
-      title: entry.title || '',
-      mood: entry.mood || 'neutral',
-      tags: entry.tags || [],
-      created_at: entry.createdAt?.toDate?.() || entry.createdAt || new Date(),
-      user_id: entry.userId
-    }));
+    const formattedEntries = entries.map(entry => {
+      const formatted = {
+        id: entry.id,
+        content: entry.content || '',
+        title: entry.title || '',
+        mood: entry.mood || 'neutral',
+        tags: entry.tags || [],
+        created_at: entry.createdAt?.toDate?.() || entry.createdAt || new Date(),
+        user_id: entry.userId
+      };
+      
+      // Debug logging to check data types
+      if (typeof formatted.content !== 'string') {
+        console.warn('⚠️ Non-string content detected:', {
+          id: formatted.id,
+          contentType: typeof formatted.content,
+          contentValue: formatted.content
+        });
+        formatted.content = String(formatted.content || '');
+      }
+      
+      return formatted;
+    });
+    
+    console.log('📤 Sending to Python backend:', {
+      count: formattedEntries.length,
+      sample: formattedEntries[0] ? {
+        id: formattedEntries[0].id,
+        contentType: typeof formattedEntries[0].content,
+        contentLength: formattedEntries[0].content?.length || 0,
+        hasContent: Boolean(formattedEntries[0].content)
+      } : 'No entries'
+    });
+    
+    return formattedEntries;
   }
 
   /**

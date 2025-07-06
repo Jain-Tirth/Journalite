@@ -2,7 +2,6 @@
 Replaces hardcoded keyword arrays with intelligent AI analysis*/
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
 class AIMoodAnalysisService {
   constructor() {
     this.genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
@@ -117,18 +116,28 @@ Consider:
    */
   async analyzeEmotionDistribution(entries) {
     try {
-      // Extract text content from entries
-      const entryTexts = entries.map(entry => ({
-        id: entry.id,
-        text: `${entry.title || ''} ${entry.content || ''}`.trim(),
-        date: entry.createdAt
-      }));
+      const entryTexts = entries.map(entry => {
+        let title = entry.title;
+        let content = entry.content;
+        
+        const combinedText = `${title} ${content}`.trim();
+      
+        return {
+          id: entry.id,
+          text: combinedText,
+          date: entry.createdAt
+        };
+      }).filter(entry => entry.text.length > 0); // Filter out empty entries
+      
+      console.log("Processed entry texts:", entryTexts.slice(0, 3)); // Log first 3 for debugging
 
       const prompt = `Analyze the emotional distribution across these journal entries:
 
 Entries: ${JSON.stringify(entryTexts.slice(0, 20))} ${entryTexts.length > 20 ? '... and ' + (entryTexts.length - 20) + ' more entries' : ''}
 
-Provide a comprehensive emotional analysis in JSON format:
+IMPORTANT: Respond with ONLY valid JSON, no markdown formatting, no explanation text.
+
+Return this exact JSON structure:
 {
   "emotion_distribution": [
     {
@@ -154,12 +163,15 @@ Analyze for:
 2. Emotional intensity and depth
 3. Psychological patterns and trends
 4. Mental health indicators
-5. Emotional growth and development`;
+5. Emotional growth and development
+
+Respond with ONLY the JSON object, no other text.`;
 
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       
       try {
+        console.log(response.text());
         const analysis = JSON.parse(response.text());
         return {
           success: true,
@@ -181,8 +193,21 @@ Analyze for:
    */
   async generateIntelligentWordCloud(entries) {
     try {
-      // Extract all text
-      const allText = entries.map(entry => `${entry.title || ''} ${entry.content || ''}`).join(' ');
+      console.log("Entries:", entries);
+      const allText = entries.map(entry => {
+        let title = '';
+        let content = '';
+        if(entry.title){
+          title = entry.title;
+        }
+        if(entry.content){
+          content = entry.content;
+        }
+        return `${title} ${content}`.trim();
+      }).filter(text => text.length > 0).join(' ');
+      
+      console.log("Combined text length:", allText.length);
+      console.log("Sample text:", allText.substring(0, 200));
       
       const prompt = `Analyze this journal text and create an intelligent word cloud with sentiment analysis:
 
@@ -223,6 +248,7 @@ Exclude common stop words and focus on meaningful content.`;
       
       try {
         const wordCloudData = JSON.parse(response.text());
+        console.log("Word cloud data:",wordCloudData.words);
         return {
           success: true,
           words: wordCloudData.words,
