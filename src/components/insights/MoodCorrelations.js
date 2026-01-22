@@ -4,32 +4,7 @@ import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Responsive
 
 const MoodCorrelations = ({ data, loading }) => {
   const [activeTab, setActiveTab] = useState('tags'); // 'tags', 'length', 'time'
-
-  // Sample correlation data
-  const sampleData = {
-    moodTagCorrelations: {
-      happy: { work: 8, family: 12, vacation: 6, achievement: 9 },
-      sad: { work: 5, loss: 4, stress: 3, health: 2 },
-      excited: { travel: 7, project: 5, celebration: 8, opportunity: 4 },
-      calm: { meditation: 6, nature: 9, reading: 4, weekend: 7 },
-      anxious: { deadline: 6, presentation: 4, change: 5, uncertainty: 3 }
-    },
-    moodLengthCorrelations: [
-      { mood: 'happy', avgLength: 320, entries: 25 },
-      { mood: 'sad', avgLength: 450, entries: 12 },
-      { mood: 'excited', avgLength: 280, entries: 18 },
-      { mood: 'calm', avgLength: 380, entries: 15 },
-      { mood: 'anxious', avgLength: 520, entries: 10 }
-    ],
-    timeOfDayMoods: {
-      morning: { happy: 12, calm: 8, excited: 6, neutral: 4 },
-      afternoon: { happy: 8, stressed: 6, focused: 5, tired: 3 },
-      evening: { calm: 10, reflective: 8, grateful: 6, content: 4 },
-      night: { anxious: 5, sad: 4, thoughtful: 6, peaceful: 3 }
-    }
-  };
-
-  const correlations = data || sampleData;
+  const correlations = data;
 
   const moodColors = {
     happy: '#10B981',

@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // AI Service for Task Manager
 // This service integrates with Google Gemini AI API to provide intelligent features
@@ -12,14 +12,7 @@ class AIService {
       try {
         this.genAI = new GoogleGenerativeAI(this.apiKey);
         // Try different model names in order of preference
-        this.modelNames = [
-          "gemini-1.5-flash",
-          "gemini-1.5-pro",
-          "gemini-pro",
-          "models/gemini-1.5-flash",
-          "models/gemini-1.5-pro",
-          "models/gemini-pro"
-        ];
+        this.modelNames = 'gemini-2.5-flash-lite';
 
         this.model = null;
         this.currentModelName = null;
@@ -42,12 +35,12 @@ class AIService {
       return true; // Already initialized
     }
 
-    for (const modelName of this.modelNames) {
+    for (const modelName of [this.modelNames]) {
       try {
         this.model = this.genAI.getGenerativeModel({ model: modelName });
 
         // Test the model with a simple prompt
-        const testResult = await this.model.generateContent("Hello");
+        const testResult = await this.model.generateContent('Hello');
         const testResponse = testResult.response;
         const testText = testResponse.text();
 

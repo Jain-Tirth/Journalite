@@ -5,7 +5,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 class AIMoodAnalysisService {
   constructor() {
     this.genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
   }
 
   /* AI-powered mood detection from text*/
@@ -129,8 +129,6 @@ Consider:
         };
       }).filter(entry => entry.text.length > 0); // Filter out empty entries
       
-      console.log("Processed entry texts:", entryTexts.slice(0, 3)); // Log first 3 for debugging
-
       const prompt = `Analyze the emotional distribution across these journal entries:
 
 Entries: ${JSON.stringify(entryTexts.slice(0, 20))} ${entryTexts.length > 20 ? '... and ' + (entryTexts.length - 20) + ' more entries' : ''}
@@ -171,7 +169,6 @@ Respond with ONLY the JSON object, no other text.`;
       const response = await result.response;
       
       try {
-        console.log(response.text());
         const analysis = JSON.parse(response.text());
         return {
           success: true,
@@ -193,7 +190,6 @@ Respond with ONLY the JSON object, no other text.`;
    */
   async generateIntelligentWordCloud(entries) {
     try {
-      console.log("Entries:", entries);
       const allText = entries.map(entry => {
         let title = '';
         let content = '';
@@ -205,9 +201,6 @@ Respond with ONLY the JSON object, no other text.`;
         }
         return `${title} ${content}`.trim();
       }).filter(text => text.length > 0).join(' ');
-      
-      console.log("Combined text length:", allText.length);
-      console.log("Sample text:", allText.substring(0, 200));
       
       const prompt = `Analyze this journal text and create an intelligent word cloud with sentiment analysis:
 
@@ -348,39 +341,6 @@ Exclude common stop words and focus on meaningful content.`;
         emotional_complexity: 'moderate',
         emotional_stability: 'stable'
       }
-    };
-  }
-
-  /**
-   * Fallback word cloud
-   */
-  fallbackWordCloud(entries) {
-    const wordCounts = {};
-    const allText = entries.map(entry => `${entry.title || ''} ${entry.content || ''}`).join(' ').toLowerCase();
-    const words = allText.split(/\s+/).filter(word => word.length > 3);
-    
-    words.forEach(word => {
-      wordCounts[word] = (wordCounts[word] || 0) + 1;
-    });
-    
-    const wordData = Object.entries(wordCounts)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 30)
-      .map(([text, frequency]) => ({
-        text,
-        frequency,
-        sentiment: 'neutral',
-        emotional_weight: 0.5,
-        psychological_significance: 'medium',
-        color: '#6B7280',
-        size: Math.max(12, Math.min(36, frequency * 2 + 12)),
-        category: 'general'
-      }));
-    
-    return {
-      success: true,
-      words: wordData,
-      insights: { themes: ['general'], emotional_tone: 'neutral' }
     };
   }
 

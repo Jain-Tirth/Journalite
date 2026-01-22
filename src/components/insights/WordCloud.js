@@ -4,29 +4,7 @@ import { Card, Spinner, ButtonGroup, Button, Badge } from 'react-bootstrap';
 const WordCloud = ({ data, loading }) => {
   const [filterType, setFilterType] = useState('all'); // 'all', 'positive', 'negative'
 
-  // Sample word cloud data (fallback)
-  const sampleWords = [
-    { text: 'grateful', size: 48, frequency: 25, sentiment: 'positive', color: '#10B981' },
-    { text: 'happy', size: 42, frequency: 22, sentiment: 'positive', color: '#059669' },
-    { text: 'work', size: 38, frequency: 18, sentiment: 'neutral', color: '#6B7280' },
-    { text: 'family', size: 36, frequency: 16, sentiment: 'positive', color: '#10B981' },
-    { text: 'stressed', size: 34, frequency: 14, sentiment: 'negative', color: '#EF4444' },
-    { text: 'love', size: 32, frequency: 13, sentiment: 'positive', color: '#059669' },
-    { text: 'tired', size: 30, frequency: 12, sentiment: 'negative', color: '#F87171' },
-    { text: 'excited', size: 28, frequency: 11, sentiment: 'positive', color: '#10B981' },
-    { text: 'anxious', size: 26, frequency: 10, sentiment: 'negative', color: '#EF4444' },
-    { text: 'peaceful', size: 24, frequency: 9, sentiment: 'positive', color: '#059669' },
-    { text: 'challenging', size: 22, frequency: 8, sentiment: 'neutral', color: '#6B7280' },
-    { text: 'hopeful', size: 20, frequency: 7, sentiment: 'positive', color: '#10B981' },
-    { text: 'overwhelmed', size: 18, frequency: 6, sentiment: 'negative', color: '#F87171' },
-    { text: 'creative', size: 16, frequency: 5, sentiment: 'positive', color: '#059669' },
-    { text: 'frustrated', size: 14, frequency: 4, sentiment: 'negative', color: '#EF4444' },
-    { text: 'inspired', size: 12, frequency: 3, sentiment: 'positive', color: '#10B981' }
-  ];
-
-  // Use real data if available, otherwise use sample data
-  const words = (data && data.length > 0) ? data : sampleWords;
-
+  const words = Array.isArray(data) ? data : []; 
   console.log('🎨 WordCloud received data:', data ? `${data.length} words` : 'no data, using sample');
 
   // Filter words based on sentiment
