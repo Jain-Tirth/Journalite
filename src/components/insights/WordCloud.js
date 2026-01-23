@@ -4,8 +4,8 @@ import { Card, Spinner, ButtonGroup, Button, Badge } from 'react-bootstrap';
 const WordCloud = ({ data, loading }) => {
   const [filterType, setFilterType] = useState('all'); // 'all', 'positive', 'negative'
 
-  const words = Array.isArray(data) ? data : []; 
-  console.log('🎨 WordCloud received data:', data ? `${data.length} words` : 'no data, using sample');
+  const words = Array.isArray(data) ? data : [];
+  console.log('🎨 WordCloud received data:', words.length > 0 ? `${words.length} words` : 'no data');
 
   // Filter words based on sentiment
   const filteredWords = words.filter(word => {

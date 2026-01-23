@@ -15,9 +15,7 @@ import {
 } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import { journalService } from '../../services/journalService';
-import { aiService } from '../../services/aiService';
-import { aiMoodAnalysisService } from '../../services/aiMoodAnalysisService';
-import { pythonAnalyticsService } from '../../services/pythonAnalyticsService';
+import { analyticsService } from '../../services/analyticsService';
 
 const JournalEntryForm = () => {
   const { currentUser } = useAuth();
@@ -160,16 +158,18 @@ const JournalEntryForm = () => {
 
     setMoodDetectionLoading(true);
     try {
-      // Try Python backend first
-      const moodResult = await pythonAnalyticsService.analyzeMood(content);
+      // Use unified analytics service for mood detection
+      const moodResult = await analyticsService.analyzeMood(content);
 
       if (moodResult.success) {
         const mood = {
           primary: moodResult.mood,
           confidence: moodResult.confidence,
           emotions: moodResult.emotions,
-          sentimentScore: moodResult.sentimentScore,
-          keywords: moodResult.keywords
+          sentimentScore: moodResult.sentiment?.polarity,
+          keywords: moodResult.keywords,
+          reasoning: moodResult.reasoning,
+          source: moodResult.source
         };
 
         setDetectedMood(mood);
@@ -180,27 +180,8 @@ const JournalEntryForm = () => {
           mood: moodResult.mood
         }));
       } else {
-        // Use AI mood analysis as fallback
-        const aiMoodResult = await aiMoodAnalysisService.analyzeMood(content);
-
-        if (aiMoodResult.success) {
-          const mood = {
-            primary: aiMoodResult.mood,
-            confidence: aiMoodResult.confidence,
-            emotions: aiMoodResult.emotions,
-            sentimentScore: aiMoodResult.sentiment?.polarity,
-            keywords: aiMoodResult.keywords,
-            reasoning: aiMoodResult.reasoning
-          };
-
-          setDetectedMood(mood);
-          setFormData(prev => ({ ...prev, mood: aiMoodResult.mood }));
-        } else {
-          // Final fallback to simple mood detection
-          const fallbackMood = await aiService.analyzeMood(content);
-          setDetectedMood({ primary: fallbackMood, confidence: 0.7 });
-          setFormData(prev => ({ ...prev, mood: fallbackMood }));
-        }
+        setError('Failed to detect mood. Please select manually.');
+        setDetectedMood(null);
       }
     } catch (error) {
       setError('Failed to detect mood. Please try again later.');
@@ -218,14 +199,10 @@ const JournalEntryForm = () => {
 
     setLoadingAI(true);
     try {
-      const context = "You are a helpful journaling assistant providing thoughtful prompts and suggestions.";
-      const prompt = `Based on this journal entry:
-Title: "${formData.title}"
-Content: "${formData.content}"
-
-Provide a thoughtful suggestion, reflection question, or writing prompt to help the user explore their thoughts deeper. Keep it encouraging and insightful.`;
-
-      const suggestion = await aiService.callGeminiAPI(prompt, context);
+      const suggestion = await analyticsService.getJournalingSuggestion(
+        formData.title,
+        formData.content
+      );
       setAiSuggestion(suggestion);
     } catch (error) {
       setError('Failed to get AI suggestion. Please try again.');

@@ -3,12 +3,14 @@
 
 /* Import our custom theme */
 @import './styles/theme.css';
+@import './styles/journaling-theme.css';
 
 /* General Styles */
 .App {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 main {

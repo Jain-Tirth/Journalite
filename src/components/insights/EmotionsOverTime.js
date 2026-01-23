@@ -16,7 +16,7 @@ const EmotionsOverTime = ({ data, loading }) => {
     { date: '2025-01-07', happy: 2, sad: 1, angry: 1, anxious: 1, excited: 1, calm: 2 }
   ];
 
-  const chartData = data || sampleData;
+  const chartData = (Array.isArray(data) && data.length > 0) ? data : sampleData;
 
   // Convert to percentage data for percentage view
   const percentageData = chartData.map(item => {

@@ -22,8 +22,31 @@ const SentimentAnalysis = ({ data, loading }) => {
     { date: '2025-01-07', score: 0.1, label: 'Neutral' }
   ];
 
-  const distributionData = data?.distribution || sampleDistribution;
-  const overTimeData = data?.overTime || sampleOverTime;
+  // Transform sentiment data for distribution chart
+  const createDistributionData = (sentimentData) => {
+    if (!sentimentData || sentimentData.length === 0) return sampleDistribution;
+    
+    const totals = sentimentData.reduce((acc, item) => {
+      acc.veryPositive += item.score >= 0.6 ? 1 : 0;
+      acc.positive += (item.score >= 0.2 && item.score < 0.6) ? 1 : 0;
+      acc.neutral += (item.score >= -0.2 && item.score < 0.2) ? 1 : 0;
+      acc.negative += (item.score >= -0.6 && item.score < -0.2) ? 1 : 0;
+      acc.veryNegative += item.score < -0.6 ? 1 : 0;
+      return acc;
+    }, { veryPositive: 0, positive: 0, neutral: 0, negative: 0, veryNegative: 0 });
+    
+    const total = sentimentData.length;
+    return [
+      { sentiment: 'Very Positive', value: Math.round((totals.veryPositive / total) * 100), color: '#10B981' },
+      { sentiment: 'Positive', value: Math.round((totals.positive / total) * 100), color: '#34D399' },
+      { sentiment: 'Neutral', value: Math.round((totals.neutral / total) * 100), color: '#6B7280' },
+      { sentiment: 'Negative', value: Math.round((totals.negative / total) * 100), color: '#F87171' },
+      { sentiment: 'Very Negative', value: Math.round((totals.veryNegative / total) * 100), color: '#EF4444' }
+    ];
+  };
+
+  const distributionData = Array.isArray(data) ? createDistributionData(data) : sampleDistribution;
+  const overTimeData = Array.isArray(data) && data.length > 0 ? data : sampleOverTime;
 
   const getSentimentColor = (score) => {
     if (score >= 0.6) return '#10B981'; // Very Positive
