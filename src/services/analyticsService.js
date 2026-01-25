@@ -76,15 +76,6 @@ class AnalyticsService {
       }
     }
 
-    // Try Python backend (if available)
-    if (this.pythonAvailable) {
-      try {
-        return await this.analyzeMoodWithPython(text);
-      } catch (error) {
-        console.warn('⚠️ Python mood analysis failed, using heuristics:', error.message);
-      }
-    }
-
     // Last resort: client-side heuristics
     return this.analyzeMoodWithHeuristics(text);
   }
@@ -143,99 +134,75 @@ Guidelines:
     }
   }
 
-  /**
-   * Python backend mood analysis
-   */
-  async analyzeMoodWithPython(text) {
-    const response = await fetch(`${this.pythonBaseURL}/analyze-mood`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
-    });
+  // /**
+  //  * Client-side heuristic mood analysis
+  //  */
+  // analyzeMoodWithHeuristics(text) {
+  //   const moodKeywords = {
+  //     happy: ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'love', 'grateful', 'blessed'],
+  //     sad: ['sad', 'depressed', 'down', 'upset', 'crying', 'tears', 'lonely', 'hurt', 'miss'],
+  //     angry: ['angry', 'mad', 'furious', 'annoyed', 'frustrated', 'rage', 'hate', 'irritated'],
+  //     anxious: ['anxious', 'worried', 'nervous', 'stressed', 'panic', 'fear', 'scared', 'overwhelmed'],
+  //     excited: ['excited', 'thrilled', 'pumped', 'energetic', 'enthusiastic', 'can\'t wait'],
+  //     calm: ['calm', 'peaceful', 'relaxed', 'zen', 'tranquil', 'serene', 'content'],
+  //     grateful: ['grateful', 'thankful', 'blessed', 'appreciate', 'lucky', 'fortunate']
+  //   };
 
-    if (!response.ok) throw new Error('Python API request failed');
+  //   const textLower = text.toLowerCase();
+  //   const moodScores = {};
+  //   let totalScore = 0;
 
-    const result = await response.json();
-    return {
-      success: true,
-      mood: result.mood,
-      confidence: result.confidence,
-      emotions: result.emotions,
-      sentimentScore: result.sentiment_score,
-      keywords: result.keywords,
-      source: 'python'
-    };
-  }
+  //   // Calculate mood scores
+  //   for (const [mood, keywords] of Object.entries(moodKeywords)) {
+  //     const score = keywords.filter(keyword => textLower.includes(keyword)).length;
+  //     if (score > 0) {
+  //       moodScores[mood] = score;
+  //       totalScore += score;
+  //     }
+  //   }
 
-  /**
-   * Client-side heuristic mood analysis
-   */
-  analyzeMoodWithHeuristics(text) {
-    const moodKeywords = {
-      happy: ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'love', 'grateful', 'blessed'],
-      sad: ['sad', 'depressed', 'down', 'upset', 'crying', 'tears', 'lonely', 'hurt', 'miss'],
-      angry: ['angry', 'mad', 'furious', 'annoyed', 'frustrated', 'rage', 'hate', 'irritated'],
-      anxious: ['anxious', 'worried', 'nervous', 'stressed', 'panic', 'fear', 'scared', 'overwhelmed'],
-      excited: ['excited', 'thrilled', 'pumped', 'energetic', 'enthusiastic', 'can\'t wait'],
-      calm: ['calm', 'peaceful', 'relaxed', 'zen', 'tranquil', 'serene', 'content'],
-      grateful: ['grateful', 'thankful', 'blessed', 'appreciate', 'lucky', 'fortunate']
-    };
+  //   // Determine primary mood
+  //   let primaryMood = 'neutral';
+  //   let confidence = 0.5;
+  //   let detectedKeywords = [];
 
-    const textLower = text.toLowerCase();
-    const moodScores = {};
-    let totalScore = 0;
+  //   if (totalScore > 0) {
+  //     primaryMood = Object.keys(moodScores).reduce((a, b) => 
+  //       moodScores[a] > moodScores[b] ? a : b
+  //     );
+  //     confidence = Math.min(0.8, 0.5 + (moodScores[primaryMood] * 0.1));
+  //     detectedKeywords = Object.keys(moodScores);
+  //   }
 
-    // Calculate mood scores
-    for (const [mood, keywords] of Object.entries(moodKeywords)) {
-      const score = keywords.filter(keyword => textLower.includes(keyword)).length;
-      if (score > 0) {
-        moodScores[mood] = score;
-        totalScore += score;
-      }
-    }
-
-    // Determine primary mood
-    let primaryMood = 'neutral';
-    let confidence = 0.5;
-    let detectedKeywords = [];
-
-    if (totalScore > 0) {
-      primaryMood = Object.keys(moodScores).reduce((a, b) => 
-        moodScores[a] > moodScores[b] ? a : b
-      );
-      confidence = Math.min(0.8, 0.5 + (moodScores[primaryMood] * 0.1));
-      detectedKeywords = Object.keys(moodScores);
-    }
-
-    // Calculate sentiment polarity
-    const positiveWords = ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'love', 'grateful'];
-    const negativeWords = ['sad', 'angry', 'frustrated', 'stressed', 'anxious', 'worried', 'upset'];
+  //   // Calculate sentiment polarity
+  //   const positiveWords = ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'love', 'grateful'];
+  //   const negativeWords = ['sad', 'angry', 'frustrated', 'stressed', 'anxious', 'worried', 'upset'];
     
-    const positiveCount = positiveWords.filter(w => textLower.includes(w)).length;
-    const negativeCount = negativeWords.filter(w => textLower.includes(w)).length;
+  //   const positiveCount = positiveWords.filter(w => textLower.includes(w)).length;
+  //   const negativeCount = negativeWords.filter(w => textLower.includes(w)).length;
     
-    const polarity = totalScore > 0 
-      ? (positiveCount - negativeCount) / totalScore 
-      : 0;
+  //   const polarity = totalScore > 0 
+  //     ? (positiveCount - negativeCount) / totalScore 
+  //     : 0;
 
-    return {
-      success: true,
-      mood: primaryMood,
-      confidence,
-      emotions: {
-        primary: primaryMood,
-        secondary: Object.keys(moodScores).filter(m => m !== primaryMood).slice(0, 2),
-        intensity: confidence > 0.7 ? 'high' : confidence > 0.5 ? 'moderate' : 'low'
-      },
-      sentiment: {
-        polarity,
-        subjectivity: 0.5
-      },
-      keywords: detectedKeywords,
-      reasoning: 'Detected based on keyword analysis',
-      source: 'heuristics'
-    };
-  }
+  //   return {
+  //     success: true,
+  //     mood: primaryMood,
+  //     confidence,
+  //     emotions: {
+  //       primary: primaryMood,
+  //       secondary: Object.keys(moodScores).filter(m => m !== primaryMood).slice(0, 2),
+  //       intensity: confidence > 0.7 ? 'high' : confidence > 0.5 ? 'moderate' : 'low'
+  //     },
+  //     sentiment: {
+  //       polarity,
+  //       subjectivity: 0.5
+  //     },
+  //     keywords: detectedKeywords,
+  //     reasoning: 'Detected based on keyword analysis',
+  //     source: 'heuristics'
+  //   };
+  // }
 
   getDefaultMoodResult() {
     return {
@@ -625,7 +592,8 @@ Exclude common stop words.`;
       shortestEntry: Infinity,
       entriesByDayOfWeek: {},
       entriesByTimeOfDay: { morning: 0, afternoon: 0, evening: 0, night: 0 },
-      entryLengths: { '0-100': 0, '100-300': 0, '300-500': 0, '500+': 0 }
+      entryLengths: { '0-100': 0, '100-300': 0, '300-500': 0, '500+': 0 },
+      entriesByHour: {} // Track by hour for most active hour
     };
 
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -649,6 +617,10 @@ Exclude common stop words.`;
       patterns.entriesByDayOfWeek[dayOfWeek] = (patterns.entriesByDayOfWeek[dayOfWeek] || 0) + 1;
 
       const hour = date.getHours();
+      
+      // Track entries by hour
+      patterns.entriesByHour[hour] = (patterns.entriesByHour[hour] || 0) + 1;
+      
       if (hour >= 5 && hour < 12) patterns.entriesByTimeOfDay.morning++;
       else if (hour >= 12 && hour < 17) patterns.entriesByTimeOfDay.afternoon++;
       else if (hour >= 17 && hour < 21) patterns.entriesByTimeOfDay.evening++;
@@ -663,6 +635,14 @@ Exclude common stop words.`;
 
     const mostProductiveDay = Object.entries(patterns.entriesByDayOfWeek)
       .sort(([, a], [, b]) => b - a)[0]?.[0] || 'N/A';
+
+    // Find most active hour
+    const mostActiveHourEntry = Object.entries(patterns.entriesByHour)
+      .sort(([, a], [, b]) => b - a)[0];
+    
+    const mostActiveHour = mostActiveHourEntry 
+      ? `${mostActiveHourEntry[0]}:00` 
+      : 'N/A';
 
     // Transform to component-expected format
     const total = entries.length;
@@ -721,6 +701,7 @@ Exclude common stop words.`;
         total_words: patterns.totalWords,
         avg_words_per_entry: patterns.averageWordsPerEntry,
         most_active_day: mostProductiveDay,
+        most_active_hour: mostActiveHour,
         longest_entry: patterns.longestEntry,
         shortest_entry: patterns.shortestEntry
       }

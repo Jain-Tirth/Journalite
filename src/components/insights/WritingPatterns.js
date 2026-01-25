@@ -3,45 +3,14 @@ import { Card, Spinner, Row, Col, ProgressBar } from 'react-bootstrap';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const WritingPatterns = ({ data, loading }) => {
-  // Sample data for demonstration
-  const sampleData = {
-    writingTimes: [
-      { time: 'Morning', count: 15, percentage: 35 },
-      { time: 'Afternoon', count: 8, percentage: 19 },
-      { time: 'Evening', count: 12, percentage: 28 },
-      { time: 'Night', count: 8, percentage: 18 }
-    ],
-    entryLengths: [
-      { range: '0-100 words', count: 5, percentage: 12 },
-      { range: '100-300 words', count: 18, percentage: 42 },
-      { range: '300-500 words', count: 12, percentage: 28 },
-      { range: '500+ words', count: 8, percentage: 18 }
-    ],
-    weeklyPattern: [
-      { day: 'Mon', count: 8 },
-      { day: 'Tue', count: 6 },
-      { day: 'Wed', count: 7 },
-      { day: 'Thu', count: 5 },
-      { day: 'Fri', count: 4 },
-      { day: 'Sat', count: 9 },
-      { day: 'Sun', count: 11 }
-    ],
-    stats: {
-      total_entries: 43,
-      total_words: 12450,
-      avg_words_per_entry: 285,
-      most_active_day: 'Sunday',
-      most_active_hour: '9'
-    }
-  };
 
-  // Safely handle data with proper fallbacks
-  const patterns = data && typeof data === 'object' ? {
-    writingTimes: data.writingTimes || sampleData.writingTimes,
-    entryLengths: data.entryLengths || sampleData.entryLengths,
-    weeklyPattern: data.day_of_week || data.weeklyPattern || sampleData.weeklyPattern,
-    stats: data.stats || sampleData.stats
-  } : sampleData;
+  // Setting the data.
+  const patterns = data && typeof data === 'object' && data.writingTimes && data.entryLengths && data.weeklyPattern && data.stats && {
+    writingTimes: data.writingTimes ,
+    entryLengths: data.entryLengths,
+    weeklyPattern: data.weeklyPattern ,
+    stats: data.stats
+  };
 
   // Removed unused timeColors variable
 
@@ -78,28 +47,50 @@ const WritingPatterns = ({ data, loading }) => {
           <>
             {/* Writing Statistics */}
             <Row className="mb-4">
-              <Col md={3}>
+              <Col md={3} sm={6}>
                 <div className="text-center p-3 bg-light rounded">
-                  <h3 className="text-primary mb-1">{patterns.stats.avg_words_per_entry || patterns.stats.averageLength || 0}</h3>
-                  <small className="text-muted">Average Words per Entry</small>
+                  <h3 className="text-primary mb-1">{patterns.stats.avg_words_per_entry || 0}</h3>
+                  <small className="text-muted">Avg Words per Entry</small>
                 </div>
               </Col>
-              <Col md={3}>
+              <Col md={3} sm={6}>
                 <div className="text-center p-3 bg-light rounded">
                   <h3 className="text-success mb-1">{patterns.stats.total_entries || 0}</h3>
                   <small className="text-muted">Total Entries</small>
                 </div>
               </Col>
-              <Col md={3}>
+              <Col md={3} sm={6}>
                 <div className="text-center p-3 bg-light rounded">
-                  <h3 className="text-info mb-1">{patterns.stats.total_words || 0}</h3>
+                  <h3 className="text-info mb-1">{patterns.stats.total_words?.toLocaleString() || 0}</h3>
                   <small className="text-muted">Total Words</small>
                 </div>
               </Col>
-              <Col md={3}>
+              <Col md={3} sm={6}>
                 <div className="text-center p-3 bg-light rounded">
                   <h3 className="text-warning mb-1">{patterns.stats.most_active_day || 'N/A'}</h3>
                   <small className="text-muted">Most Active Day</small>
+                </div>
+              </Col>
+            </Row>
+
+            {/* Additional Statistics */}
+            <Row className="mb-4">
+              <Col md={4}>
+                <div className="text-center p-3 bg-light rounded">
+                  <h3 className="text-primary mb-1">{patterns.stats.most_active_hour || 'N/A'}</h3>
+                  <small className="text-muted">Most Active Hour</small>
+                </div>
+              </Col>
+              <Col md={4}>
+                <div className="text-center p-3 bg-light rounded">
+                  <h3 className="text-success mb-1">{patterns.stats.longest_entry || 0}</h3>
+                  <small className="text-muted">Longest Entry (words)</small>
+                </div>
+              </Col>
+              <Col md={4}>
+                <div className="text-center p-3 bg-light rounded">
+                  <h3 className="text-info mb-1">{patterns.stats.shortest_entry || 0}</h3>
+                  <small className="text-muted">Shortest Entry (words)</small>
                 </div>
               </Col>
             </Row>

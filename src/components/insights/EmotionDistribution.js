@@ -22,16 +22,7 @@ const EmotionDistribution = ({ data, loading }) => {
     overwhelmed: '#7C3AED'
   };
 
-  // Sample data if no real data is available
-  const sampleData = [
-    { name: 'Happy', value: 35, emoji: '😊' },
-    { name: 'Calm', value: 25, emoji: '😌' },
-    { name: 'Neutral', value: 20, emoji: '😐' },
-    { name: 'Sad', value: 12, emoji: '😢' },
-    { name: 'Anxious', value: 8, emoji: '😟' }
-  ];
-
-  const chartData = data || sampleData;
+  const chartData = data ;
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {

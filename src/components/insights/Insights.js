@@ -67,7 +67,7 @@ const Insights = () => {
         setError('Failed to fetch journal entries.');
       }
     } catch (err) {
-      setError('Failed to load insights. Please try again.');
+      setError('Failed to load insights. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -80,17 +80,18 @@ const Insights = () => {
       // Decrypt entries for analysis
       const decryptedEntries = entriesData.map((entry) => {
         try {
-          const receivedEntry = fieldEncryptionService.decryptJournalEntry(entry, currentUser.uid);
+          const decryptResult = fieldEncryptionService.decryptJournalEntry(entry, currentUser.uid);
+          const receivedEntry = decryptResult.success ? decryptResult.decryptedEntry : entry;
           return {
             id: entry.id,
             title: receivedEntry.title || '',
             content: receivedEntry.content || '',
-            mood: entry.mood,
+            mood: receivedEntry.mood,
             createdAt: entry.createdAt,
             tags: entry.tags || []
           };
         } catch (decryptError) {
-          console.error(`❌ Failed to decrypt entry ${entry.id}:`, decryptError);
+          console.error(`Failed to decrypt entry ${entry.id}:`, decryptError);
           return {
             id: entry.id,
             title: '[Decryption Failed]',
@@ -115,7 +116,7 @@ const Insights = () => {
         setError('Analysis failed. Some insights may not be available.');
       }
     } catch (err) {
-      console.error('❌ Analysis failed:', err);
+      console.error('Analysis failed:', err);
       setError('AI analysis failed. Please try again.');
     } finally {
       setAnalyzing(false);
