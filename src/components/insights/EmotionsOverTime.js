@@ -4,7 +4,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 const EmotionsOverTime = ({ data, loading }) => {
   const [viewMode, setViewMode] = useState('stacked'); // 'stacked' or 'percentage'
-  const chartData = (Array.isArray(data) && data.length > 0) & data;
+  const chartData = (Array.isArray(data) && data.length > 0) ? data : [];
 
   // Convert to percentage data for percentage view
   const percentageData = chartData.map(item => {
