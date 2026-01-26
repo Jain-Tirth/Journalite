@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "build",
+    "public": "frontend/build",
     "site": "journalite-a1327",
     "ignore": [
       "firebase.json",
@@ -71,10 +71,10 @@
     ]
   },
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+    "rules": "backend/firestore.rules",
+    "indexes": "backend/firestore.indexes.json"
   },
   "storage": {
-    "rules": "storage.rules"
+    "rules": "backend/storage.rules"
   }
 }

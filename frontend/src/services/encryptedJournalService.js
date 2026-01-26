@@ -17,22 +17,19 @@ class EncryptedJournalService {
    */
   async createEntry(entryData, userId) {
     try {
-      console.log('📝 Creating encrypted journal entry for user:', userId);
-
       // Encrypt only title and content
       const encryptionResult = fieldEncryptionService.encryptJournalEntry(entryData, userId);
-      
+
       if (!encryptionResult.success) {
         throw new Error(`Encryption failed: ${encryptionResult.error}`);
       }
 
       // Store encrypted entry using base service
       const result = await this.baseService.createEntry(encryptionResult.encryptedEntry, userId);
-      
-      console.log('✅ Encrypted journal entry created successfully');
+
       return result;
     } catch (error) {
-      console.error('❌ Error creating encrypted journal entry:', error);
+      console.error('Error creating encrypted journal entry:', error);
       throw error;
     }
   }
@@ -42,7 +39,6 @@ class EncryptedJournalService {
    */
   async getUserEntries(userId, limitCount = 50) {
     try {
-      console.log('📖 Fetching encrypted journal entries for user:', userId);
 
       // Get encrypted entries from database
       const result = await this.baseService.getUserEntries(userId, limitCount);
@@ -55,10 +51,9 @@ class EncryptedJournalService {
       const decryptionResult = fieldEncryptionService.decryptJournalEntries(result.data, userId);
 
       if (!decryptionResult.success && decryptionResult.errors.length > 0) {
-        console.warn('⚠️ Some entries failed to decrypt:', decryptionResult.errors);
+        console.warn(' Some entries failed to decrypt:', decryptionResult.errors);
       }
 
-      console.log('✅ Successfully decrypted journal entries');
       return {
         success: true,
         data: decryptionResult.decryptedEntries,
@@ -75,8 +70,6 @@ class EncryptedJournalService {
    */
   async getEntry(entryId, userId) {
     try {
-      console.log('📖 Fetching encrypted journal entry:', entryId);
-
       // Get encrypted entry from database
       const result = await this.baseService.getEntry(entryId, userId);
 
@@ -88,12 +81,11 @@ class EncryptedJournalService {
       const decryptionResult = fieldEncryptionService.decryptJournalEntry(result.data, userId);
 
       if (!decryptionResult.success) {
-        console.warn('⚠️ Entry decryption failed:', decryptionResult.error);
+        console.warn('Entry decryption failed:', decryptionResult.error);
         // Return original entry if decryption fails
         return result;
       }
 
-      console.log('✅ Successfully decrypted journal entry');
       return {
         success: true,
         data: decryptionResult.decryptedEntry
@@ -109,8 +101,6 @@ class EncryptedJournalService {
    */
   async updateEntry(entryId, updateData, userId) {
     try {
-      console.log('📝 Updating encrypted journal entry:', entryId);
-
       // Encrypt only title and content in update data
       const encryptionResult = fieldEncryptionService.encryptJournalEntry(updateData, userId);
 
@@ -120,11 +110,10 @@ class EncryptedJournalService {
 
       // Update encrypted entry
       const result = await this.baseService.updateEntry(entryId, encryptionResult.encryptedEntry, userId);
-      
-      console.log('✅ Encrypted journal entry updated successfully');
+
       return result;
     } catch (error) {
-      console.error('❌ Error updating encrypted journal entry:', error);
+      console.error('Error updating encrypted journal entry:', error);
       throw error;
     }
   }
@@ -136,7 +125,7 @@ class EncryptedJournalService {
     try {
       return await this.baseService.deleteEntry(entryId, userId);
     } catch (error) {
-      console.error('❌ Error deleting journal entry:', error);
+      console.error('Error deleting journal entry:', error);
       throw error;
     }
   }
@@ -148,7 +137,7 @@ class EncryptedJournalService {
     try {
       return await this.baseService.uploadImage(file, userId, entryId);
     } catch (error) {
-      console.error('❌ Error uploading image:', error);
+      console.error('Error uploading image:', error);
       throw error;
     }
   }
@@ -158,8 +147,6 @@ class EncryptedJournalService {
    */
   async searchEntries(userId, searchTerm) {
     try {
-      console.log('🔍 Searching encrypted journal entries for:', searchTerm);
-
       // Get all entries first
       const entriesResult = await this.getUserEntries(userId);
 
@@ -173,13 +160,12 @@ class EncryptedJournalService {
         return searchableText.includes(searchTerm.toLowerCase());
       });
 
-      console.log('✅ Search completed, found', searchResults.length, 'results');
       return {
         success: true,
         data: searchResults
       };
     } catch (error) {
-      console.error('❌ Error searching encrypted journal entries:', error);
+      console.error('Error searching encrypted journal entries:', error);
       throw error;
     }
   }
@@ -198,7 +184,7 @@ class EncryptedJournalService {
 
       // Filter by mood (mood is not encrypted)
       const moodEntries = entriesResult.data.filter(entry => entry.mood === mood);
-      
+
       return {
         success: true,
         data: moodEntries
@@ -261,7 +247,7 @@ class EncryptedJournalService {
         data: stats
       };
     } catch (error) {
-      console.error('❌ Error generating journal stats from encrypted data:', error);
+      console.error('Error generating journal stats from encrypted data:', error);
       throw error;
     }
   }

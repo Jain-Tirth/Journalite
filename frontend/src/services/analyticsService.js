@@ -31,7 +31,7 @@ class AnalyticsService {
 
     // Python backend configuration (optional)
     this.pythonBaseURL = process.env.REACT_APP_PYTHON_API_URL || 'http://localhost:8080';
-    this.pythonAvailable = false;
+    this.pythonAvailable = true;
     this.checkPythonBackend();
 
     // Cache configuration
@@ -48,7 +48,7 @@ class AnalyticsService {
       });
       this.pythonAvailable = response.ok;
     } catch (error) {
-      this.pythonAvailable = false;
+      this.pythonAvailable = true;
     }
   }
 
@@ -850,7 +850,7 @@ Exclude common stop words.`;
 
       return { success: true, insights };
     } catch (error) {
-      console.error('❌ Comprehensive insights generation failed:', error);
+      console.error('Comprehensive insights generation failed:', error);
       return {
         success: false,
         error: error.message,
@@ -900,13 +900,12 @@ Exclude common stop words.`;
       const cacheAge = Date.now() - timestamp;
 
       if (cacheAge < this.cacheTimeout) {
-        console.log('📦 Using cached analytics');
         return data;
       }
 
       return null;
     } catch (error) {
-      console.error('❌ Cache retrieval failed:', error);
+      console.error('Cache retrieval failed:', error);
       return null;
     }
   }
@@ -918,7 +917,7 @@ Exclude common stop words.`;
         timestamp: Date.now()
       }));
     } catch (error) {
-      console.error('❌ Cache storage failed:', error);
+      console.error('Cache storage failed:', error);
     }
   }
 
@@ -926,7 +925,7 @@ Exclude common stop words.`;
     try {
       localStorage.removeItem(`analytics_${userId}`);
     } catch (error) {
-      console.error('❌ Cache clearing failed:', error);
+      console.error('Cache clearing failed:', error);
     }
   }
 
@@ -960,16 +959,6 @@ Provide a thoughtful suggestion, reflection question, or writing prompt to help 
     }
   }
 
-  getFallbackSuggestion() {
-    const suggestions = [
-      "Consider reflecting on what you're grateful for today. Gratitude can shift perspectives.",
-      "What emotions are you feeling right now? Try to name them and explore why.",
-      "Think about a challenge you're facing. What would you tell a friend in the same situation?",
-      "What's one small step you could take today toward a goal that matters to you?",
-      "Reflect on a moment today that brought you joy, however small it might have been."
-    ];
-    return suggestions[Math.floor(Math.random() * suggestions.length)];
-  }
 
   getEmotionEmoji(emotion) {
     const emojiMap = {

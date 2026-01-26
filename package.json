@@ -1,53 +1,27 @@
 {
-  "name": "journalite",
-  "version": "0.1.0",
+  "name": "journalite-workspace",
+  "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.9.0",
-    "bootstrap": "^5.3.5",
-    "bootstrap-icons": "^1.11.3",
-    "crypto-js": "^4.2.0",
-    "firebase": "^11.6.1",
-    "formik": "^2.4.6",
-    "react": "^19.1.0",
-    "react-bootstrap": "^2.10.9",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.5.3",
-    "react-scripts": "5.0.1",
-    "recharts": "^2.15.3",
-    "web-vitals": "^2.1.4",
-    "yup": "^1.6.1"
-  },
+  "description": "Journalite - A journaling app with mood tracking and analytics",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "frontend:install": "cd frontend && npm install",
+    "frontend:start": "cd frontend && npm start",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:test": "cd frontend && npm test",
+    "deploy": "firebase deploy",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:firestore": "firebase deploy --only firestore",
+    "deploy:storage": "firebase deploy --only storage",
+    "start": "npm run frontend:start"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/journalite.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "@types/dotenv": "^8.2.3"
-  }
+  "author": "",
+  "license": "MIT"
 }

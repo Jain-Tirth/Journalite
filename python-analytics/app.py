@@ -5,13 +5,8 @@ import logging
 import json
 from datetime import datetime
 import random
-
-# Simple imports without heavy dependencies
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    print("python-dotenv not installed, using environment variables directly")
+from dotenv import load_dotenv
+load_dotenv()
 
 try:
     from textblob import TextBlob
@@ -27,52 +22,6 @@ CORS(app)
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Simple mood detection function
-def simple_mood_detection(text):
-    """Simple mood detection using basic keyword analysis"""
-    text_lower = text.lower()
-
-    # Define mood keywords
-    mood_keywords = {
-        'happy': ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'fantastic', 'love', 'awesome'],
-        'sad': ['sad', 'depressed', 'down', 'upset', 'crying', 'tears', 'lonely', 'hurt'],
-        'angry': ['angry', 'mad', 'furious', 'annoyed', 'frustrated', 'rage', 'hate'],
-        'anxious': ['anxious', 'worried', 'nervous', 'stressed', 'panic', 'fear', 'scared'],
-        'excited': ['excited', 'thrilled', 'pumped', 'energetic', 'enthusiastic'],
-        'calm': ['calm', 'peaceful', 'relaxed', 'zen', 'tranquil', 'serene'],
-        'grateful': ['grateful', 'thankful', 'blessed', 'appreciate', 'lucky']
-    }
-
-    mood_scores = {}
-    for mood, keywords in mood_keywords.items():
-        score = sum(1 for keyword in keywords if keyword in text_lower)
-        if score > 0:
-            mood_scores[mood] = score
-
-    if mood_scores:
-        primary_mood = max(mood_scores, key=mood_scores.get)
-        confidence = min(mood_scores[primary_mood] / 10.0, 1.0)
-    else:
-        primary_mood = 'neutral'
-        confidence = 0.5
-
-    # Simple sentiment score
-    sentiment_score = 0.0
-    if TEXTBLOB_AVAILABLE:
-        try:
-            blob = TextBlob(text)
-            sentiment_score = blob.sentiment.polarity
-        except:
-            pass
-
-    return {
-        'primary_mood': primary_mood,
-        'confidence': confidence,
-        'emotions': mood_scores,
-        'sentiment_score': sentiment_score,
-        'keywords': list(mood_scores.keys())
-    }
 
 @app.route('/', methods=['GET'])
 def welcome():
@@ -344,4 +293,4 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
 
     # Run the app
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=True, host='0.0.0.0', port=port)

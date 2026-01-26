@@ -131,7 +131,7 @@ class AnalyticsEngine:
         try:
             # Combine all text
             all_text = ' '.join([entry.get('content', '') for entry in entries])
-            
+                
             # Clean and tokenize
             words = self._extract_meaningful_words(all_text)
             

@@ -2,6 +2,29 @@
 
 A modern, secure, and intelligent journaling application with AI-powered mood analysis and comprehensive insights. Built with React 19 frontend, Google Gemini AI integration, and Python analytics backend with end-to-end encryption.
 
+## Project Structure
+
+```
+journalite/
+├── frontend/           # React frontend application
+│   ├── src/           # Source code
+│   │   ├── components/  # React components
+│   │   ├── context/     # React context providers
+│   │   ├── services/    # API and service integrations
+│   │   ├── styles/      # CSS and theme files
+│   │   └── utils/       # Utility functions
+│   ├── public/        # Static assets
+│   └── build/         # Production build
+├── backend/           # Backend services and configurations
+│   ├── dataconnect/   # Firebase Data Connect
+│   ├── firestore.rules         # Firestore security rules
+│   ├── firestore.indexes.json  # Firestore indexes
+│   └── storage.rules           # Storage security rules
+├── python-analytics/  # Python analytics service (optional)
+├── firebase.json      # Firebase configuration
+└── package.json       # Root package.json for workspace
+```
+
 ##  Features
 
 ###  Smart Journaling
@@ -85,11 +108,80 @@ A modern, secure, and intelligent journaling application with AI-powered mood an
 - **Firebase Storage** - File storage
 - **Firebase App Hosting** - Modern hosting solution
 
-##  Project Structure
+##  Getting Started
+
+### Prerequisites
+- Node.js 16+ and npm
+- Firebase CLI (`npm install -g firebase-tools`)
+- (Optional) Python 3.8+ for analytics service
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd journalite
+```
+
+2. Install frontend dependencies
+```bash
+npm run frontend:install
+# or directly
+cd frontend && npm install
+```
+
+3. Configure Firebase
+   - Create a Firebase project at https://console.firebase.google.com
+   - Enable Authentication, Firestore, and Storage
+   - Copy your Firebase config to `frontend/src/services/firebase.js`
+
+4. Set up environment variables
+Create a `.env` file in the `frontend/` directory:
+```
+REACT_APP_GEMINI_API_KEY=your-gemini-api-key
+REACT_APP_PYTHON_API_URL=http://localhost:8080
+```
+
+### Development
+
+Start the frontend development server:
+```bash
+npm start
+# or
+npm run frontend:start
+```
+
+The app will open at [http://localhost:3000](http://localhost:3000)
+
+### Building for Production
+
+Build the frontend:
+```bash
+npm run frontend:build
+```
+
+### Deployment
+
+Deploy to Firebase:
+```bash
+npm run deploy
+```
+
+Deploy only hosting:
+```bash
+npm run deploy:hosting
+```
+
+Deploy Firestore rules and indexes:
+```bash
+npm run deploy:firestore
+```
+
+##  Legacy Project Structure (for reference)
 
 ```
 journalite/
-├── src/                          # React frontend source
+├── src/                          # React frontend source (MOVED TO frontend/src/)
 │   ├── components/              # React components
 │   │   ├── auth/               # Login, Register, Profile, ProtectedRoute
 │   │   ├── journal/            # JournalList, JournalDetail, JournalEntryForm
@@ -124,37 +216,17 @@ journalite/
 │   ├── app.py                 # Flask application entry point
 │   ├── requirements.txt       # Python dependencies
 │   └── Dockerfile            # Container configuration
-├── public/                     # Static assets
+├── public/                     # Static assets (MOVED TO frontend/public/)
 │   ├── index.html            # HTML template
 │   └── manifest.json         # PWA manifest
-├── build/                      # Production build output
-├── firebase.json              # Firebase configuration
-├── firestore.rules           # Firestore security rules
-├── storage.rules             # Storage security rules
-└── package.json              # Node.js dependencies
+├── build/                      # Production build output (MOVED TO frontend/build/)
+├── firebase.json              # Firebase configuration (UPDATED with new paths)
+├── firestore.rules           # Firestore security rules (MOVED TO backend/)
+├── storage.rules             # Storage security rules (MOVED TO backend/)
+└── package.json              # Node.js dependencies (NOW at frontend/package.json)
 ```
 
-## 🚦 Getting Started
-
-### Prerequisites
-- Node.js v18 or higher
-- Python 3.9+ (3.13 recommended)
-- Firebase project with Firestore and Storage enabled
-- Google AI API key for Gemini 2.0
-- Git for version control
-
-### Frontend Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd journalite
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+##  Analytics Architecture
 
 3. **Configure environment**
    - Create a `.env.local` file in the root directory
