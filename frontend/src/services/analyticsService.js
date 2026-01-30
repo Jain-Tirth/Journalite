@@ -22,11 +22,15 @@ class AnalyticsService {
     if (this.isAIAvailable) {
       try {
         this.genAI = new GoogleGenerativeAI(this.apiKey);
-        this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        // Use the stable gemini-pro model (not 1.5-pro)
+        this.model = this.genAI.getGenerativeModel({ 
+          model: "gemini-2.0-flash"
+        });
+        console.log('✅ Gemini AI initialized successfully');
       } catch (error) {
         console.error('❌ Error initializing Gemini AI:', error);
         this.isAIAvailable = false;
-      }
+      } 
     }
 
     // Python backend configuration (optional)
