@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Spinner, ButtonGroup, Button } from 'react-bootstrap';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const EmotionsOverTime = ({ data, loading }) => {
   const [viewMode, setViewMode] = useState('stacked'); // 'stacked' or 'percentage'
@@ -73,6 +73,21 @@ const EmotionsOverTime = ({ data, loading }) => {
     return null;
   };
 
+  const SinglePointTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-3 border rounded shadow-sm">
+          <p className="mb-1"><strong>{emotionEmojis[data.emotion]} {data.emotion}</strong></p>
+          <p className="mb-0" style={{ color: data.color }}>
+            {viewMode === 'percentage' ? `${data.value.toFixed(1)}%` : `${data.value} entries`}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   const CustomLegend = ({ payload }) => {
     return (
       <div className="d-flex flex-wrap justify-content-center mt-3">
@@ -99,6 +114,28 @@ const EmotionsOverTime = ({ data, loading }) => {
   const availableEmotions = Object.keys(emotionColors).filter(emotion => 
     chartData.some(item => item[emotion] > 0)
   );
+
+  const hasTimeline = chartData.length > 1;
+  const singlePointSource = chartData[chartData.length - 1];
+  const singlePointTotal = singlePointSource
+    ? Object.keys(singlePointSource).reduce((sum, key) =>
+      key !== 'date' ? sum + (singlePointSource[key] || 0) : sum, 0)
+    : 0;
+
+  const singlePointData = singlePointSource
+    ? availableEmotions.map(emotion => {
+      const rawValue = singlePointSource[emotion] || 0;
+      const value = viewMode === 'percentage'
+        ? (singlePointTotal > 0 ? (rawValue / singlePointTotal) * 100 : 0)
+        : rawValue;
+      return {
+        emotion,
+        value,
+        color: emotionColors[emotion],
+        emoji: emotionEmojis[emotion]
+      };
+    }).sort((a, b) => b.value - a.value)
+    : [];
 
   return (
     <Card className="insight-card">
@@ -133,6 +170,42 @@ const EmotionsOverTime = ({ data, loading }) => {
               <p className="mt-2 text-muted">Analyzing emotion patterns...</p>
             </div>
           </div>
+        ) : availableEmotions.length === 0 ? (
+          <div className="d-flex justify-content-center align-items-center" style={{ height: '350px' }}>
+            <div className="text-center">
+              <i className="bi bi-graph-up text-muted" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2 text-muted">Not enough data for emotion trends yet.</p>
+            </div>
+          </div>
+        ) : !hasTimeline ? (
+          <div style={{ height: '350px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={singlePointData}
+                layout="vertical"
+                margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) => viewMode === 'percentage' ? `${Math.round(value)}%` : value}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="emotion"
+                  tick={{ fontSize: 12 }}
+                  width={80}
+                />
+                <Tooltip content={<SinglePointTooltip />} />
+                <Bar dataKey="value" radius={[6, 6, 6, 6]}>
+                  {singlePointData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         ) : (
           <>
             <div style={{ height: '350px' }}>
@@ -140,7 +213,7 @@ const EmotionsOverTime = ({ data, loading }) => {
                 <AreaChart
                   data={displayData}
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                  stackOffset={viewMode === 'percentage' ? 'expand' : 'none'}
+                  stackOffset={viewMode === 'percentage' ? 'none' : 'none'}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
@@ -150,7 +223,8 @@ const EmotionsOverTime = ({ data, loading }) => {
                   />
                   <YAxis 
                     tick={{ fontSize: 12 }}
-                    tickFormatter={(value) => viewMode === 'percentage' ? `${(value * 100).toFixed(0)}%` : value}
+                    domain={viewMode === 'percentage' ? [0, 100] : ['auto', 'auto']}
+                    tickFormatter={(value) => viewMode === 'percentage' ? `${Math.round(value)}%` : value}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend content={<CustomLegend />} />

@@ -5,12 +5,36 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const WritingPatterns = ({ data, loading }) => {
 
   // Setting the data.
-  const patterns = data && typeof data === 'object' && data.writingTimes && data.entryLengths && data.weeklyPattern && data.stats && {
-    writingTimes: data.writingTimes ,
+  const patterns = data && typeof data === 'object' && data.writingTimes && data.entryLengths && data.weeklyPattern && data.stats ? {
+    writingTimes: data.writingTimes,
     entryLengths: data.entryLengths,
-    weeklyPattern: data.weeklyPattern ,
+    weeklyPattern: data.weeklyPattern,
     stats: data.stats
+  } : {
+    writingTimes: [],
+    entryLengths: [],
+    weeklyPattern: [],
+    stats: {
+      avg_words_per_entry: 0,
+      total_entries: 0,
+      total_words: 0,
+      most_active_day: 'N/A',
+      most_active_hour: 'N/A',
+      longest_entry: 0,
+      shortest_entry: 0
+    }
   };
+
+  const weekOrder = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weeklyDataMap = patterns.weeklyPattern.reduce((acc, item) => {
+    acc[item.day] = item.count;
+    return acc;
+  }, {});
+
+  const weeklyData = weekOrder.map(day => ({
+    day,
+    count: weeklyDataMap[day] || 0
+  }));
 
   // Removed unused timeColors variable
 
@@ -118,12 +142,12 @@ const WritingPatterns = ({ data, loading }) => {
             {/* Weekly Pattern Chart */}
             <div className="mb-4">
               <h6 className="text-secondary mb-3">Weekly Writing Pattern</h6>
-              <div style={{ height: '150px' }}>
+              <div style={{ height: '180px' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={patterns.weeklyPattern || []} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <BarChart data={weeklyData} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar
                       dataKey="count"

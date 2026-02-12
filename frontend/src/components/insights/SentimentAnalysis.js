@@ -1,30 +1,40 @@
 import React from 'react';
 import { Card, Spinner, Badge } from 'react-bootstrap';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, ReferenceLine } from 'recharts';
 
 const SentimentAnalysis = ({ data, loading }) => {
-  // Sample data for demonstration
-  const sampleDistribution = [
-    { sentiment: 'Very Positive', value: 15, color: '#10B981' },
-    { sentiment: 'Positive', value: 35, color: '#34D399' },
-    { sentiment: 'Neutral', value: 30, color: '#6B7280' },
-    { sentiment: 'Negative', value: 15, color: '#F87171' },
-    { sentiment: 'Very Negative', value: 5, color: '#EF4444' }
-  ];
+  const getSentimentColor = (score) => {
+    if (score >= 0.6) return '#10B981'; // Very Positive
+    if (score >= 0.2) return '#34D399'; // Positive
+    if (score >= -0.2) return '#6B7280'; // Neutral
+    if (score >= -0.6) return '#F87171'; // Negative
+    return '#EF4444'; // Very Negative
+  };
 
-  const sampleOverTime = [
-    { date: '2025-01-01', score: 0.7, label: 'Positive' },
-    { date: '2025-01-02', score: 0.3, label: 'Neutral' },
-    { date: '2025-01-03', score: 0.8, label: 'Very Positive' },
-    { date: '2025-01-04', score: -0.2, label: 'Negative' },
-    { date: '2025-01-05', score: 0.5, label: 'Positive' },
-    { date: '2025-01-06', score: 0.9, label: 'Very Positive' },
-    { date: '2025-01-07', score: 0.1, label: 'Neutral' }
-  ];
+  const getSentimentLabel = (score) => {
+    if (score >= 0.6) return 'Very Positive';
+    if (score >= 0.2) return 'Positive';
+    if (score >= -0.2) return 'Neutral';
+    if (score >= -0.6) return 'Negative';
+    return 'Very Negative';
+  };
+
+  const normalizeSentimentData = (sentimentData) => {
+    if (!Array.isArray(sentimentData)) return [];
+
+    return sentimentData
+      .filter(item => typeof item?.score === 'number' && item?.date)
+      .map(item => ({
+        ...item,
+        date: item.date,
+        label: getSentimentLabel(item.score)
+      }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+  };
 
   // Transform sentiment data for distribution chart
   const createDistributionData = (sentimentData) => {
-    if (!sentimentData || sentimentData.length === 0) return sampleDistribution;
+    if (!sentimentData || sentimentData.length === 0) return [];
     
     const totals = sentimentData.reduce((acc, item) => {
       acc.veryPositive += item.score >= 0.6 ? 1 : 0;
@@ -45,26 +55,24 @@ const SentimentAnalysis = ({ data, loading }) => {
     ];
   };
 
-  const distributionData = Array.isArray(data) ? createDistributionData(data) : sampleDistribution;
-  const overTimeData = Array.isArray(data) && data.length > 0 ? data : sampleOverTime;
+  const overTimeData = normalizeSentimentData(data);
+  const distributionData = overTimeData.length > 0 ? createDistributionData(overTimeData) : [];
+  const hasTimeline = overTimeData.length > 1;
 
-  const getSentimentColor = (score) => {
-    if (score >= 0.6) return '#10B981'; // Very Positive
-    if (score >= 0.2) return '#34D399'; // Positive
-    if (score >= -0.2) return '#6B7280'; // Neutral
-    if (score >= -0.6) return '#F87171'; // Negative
-    return '#EF4444'; // Very Negative
-  };
+  const singlePointData = !hasTimeline && overTimeData.length === 1
+    ? [
+        {
+          label: getSentimentLabel(overTimeData[0].score),
+          value: Math.round(Math.abs(overTimeData[0].score) * 100),
+          score: overTimeData[0].score,
+          color: getSentimentColor(overTimeData[0].score)
+        }
+      ]
+    : [];
 
-  const getSentimentLabel = (score) => {
-    if (score >= 0.6) return 'Very Positive';
-    if (score >= 0.2) return 'Positive';
-    if (score >= -0.2) return 'Neutral';
-    if (score >= -0.6) return 'Negative';
-    return 'Very Negative';
-  };
-
-  const averageSentiment = overTimeData.reduce((sum, item) => sum + item.score, 0) / overTimeData.length;
+  const averageSentiment = overTimeData.length > 0
+    ? overTimeData.reduce((sum, item) => sum + item.score, 0) / overTimeData.length
+    : 0;
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -120,12 +128,19 @@ const SentimentAnalysis = ({ data, loading }) => {
               <p className="mt-2 text-muted">Analyzing sentiment...</p>
             </div>
           </div>
+        ) : overTimeData.length === 0 ? (
+          <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+            <div className="text-center">
+              <i className="bi bi-graph-up text-muted" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2 text-muted">Not enough data for sentiment charts yet.</p>
+            </div>
+          </div>
         ) : (
           <>
             {/* Sentiment Distribution */}
             <div className="mb-4">
               <h6 className="text-secondary mb-3">Sentiment Score Distribution</h6>
-              <div style={{ height: '150px' }}>
+              <div style={{ height: '170px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={distributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -138,13 +153,9 @@ const SentimentAnalysis = ({ data, loading }) => {
                     />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip content={<BarTooltip />} />
-                    <Bar 
-                      dataKey="value" 
-                      fill="#8884d8"
-                      radius={[4, 4, 0, 0]}
-                    >
+                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                       {distributionData.map((entry, index) => (
-                        <Bar key={`cell-${index}`} fill={entry.color} />
+                        <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -155,30 +166,47 @@ const SentimentAnalysis = ({ data, loading }) => {
             {/* Sentiment Over Time */}
             <div className="mb-3">
               <h6 className="text-secondary mb-3">Sentiments Over Time</h6>
-              <div style={{ height: '150px' }}>
+              <div style={{ height: '190px' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={overTimeData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="date" 
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => new Date(value).toLocaleDateString()}
-                    />
-                    <YAxis 
-                      domain={[-1, 1]} 
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => value.toFixed(1)}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Line 
-                      type="monotone" 
-                      dataKey="score" 
-                      stroke="#3B82F6"
-                      strokeWidth={3}
-                      dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
-                    />
-                  </LineChart>
+                  {hasTimeline ? (
+                    <LineChart data={overTimeData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis 
+                        domain={[-1, 1]} 
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => value.toFixed(1)}
+                      />
+                      <Tooltip content={<CustomTooltip />} />
+                      <ReferenceLine y={0} stroke="#9CA3AF" strokeDasharray="4 4" />
+                      <Line 
+                        type="monotone" 
+                        dataKey="score" 
+                        stroke="#3B82F6"
+                        strokeWidth={3}
+                        dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
+                      />
+                    </LineChart>
+                  ) : (
+                    <BarChart data={singlePointData} layout="vertical" margin={{ top: 10, right: 30, left: 40, bottom: 10 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" tick={{ fontSize: 12 }} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+                      <YAxis type="category" dataKey="label" tick={{ fontSize: 12 }} width={120} />
+                      <Tooltip
+                        formatter={(value, name, props) => [`${props.payload.score.toFixed(2)} score`, 'Sentiment']}
+                      />
+                      <Bar dataKey="value" radius={[6, 6, 6, 6]}>
+                        {singlePointData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  )}
                 </ResponsiveContainer>
               </div>
             </div>

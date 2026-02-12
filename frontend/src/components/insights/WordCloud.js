@@ -7,8 +7,38 @@ const WordCloud = ({ data, loading }) => {
   const words = Array.isArray(data) ? data : [];
   console.log('🎨 WordCloud received data:', words.length > 0 ? `${words.length} words` : 'no data');
 
+  const positiveLexicon = new Set([
+    'happy', 'joy', 'love', 'excited', 'great', 'amazing', 'wonderful', 'grateful', 'success', 'achieved',
+    'calm', 'peaceful', 'optimistic', 'confident', 'content', 'hopeful', 'proud', 'energized'
+  ]);
+  const negativeLexicon = new Set([
+    'sad', 'angry', 'frustrated', 'stressed', 'anxious', 'worried', 'tired', 'upset', 'failed', 'difficult',
+    'lonely', 'overwhelmed', 'disappointed', 'hurt', 'fear'
+  ]);
+
+  const normalizeSentiment = (word) => {
+    const raw = typeof word?.sentiment === 'string' ? word.sentiment.toLowerCase() : '';
+    if (raw === 'positive' || raw === 'negative' || raw === 'neutral') return raw;
+
+    const lowerText = (word?.text || '').toLowerCase();
+    if (positiveLexicon.has(lowerText)) return 'positive';
+    if (negativeLexicon.has(lowerText)) return 'negative';
+    return 'neutral';
+  };
+
+  const normalizedWords = words.map(word => {
+    const sentiment = normalizeSentiment(word);
+    const color = word.color || (sentiment === 'positive' ? '#10B981' : sentiment === 'negative' ? '#EF4444' : '#6B7280');
+    return {
+      ...word,
+      sentiment,
+      color,
+      size: word.size || 18
+    };
+  });
+
   // Filter words based on sentiment
-  const filteredWords = words.filter(word => {
+  const filteredWords = normalizedWords.filter(word => {
     if (filterType === 'positive') return word.sentiment === 'positive';
     if (filterType === 'negative') return word.sentiment === 'negative';
     return true;
@@ -102,11 +132,11 @@ const WordCloud = ({ data, loading }) => {
   };
 
   const getSentimentStats = () => {
-    const positive = words.filter(w => w.sentiment === 'positive').length;
-    const negative = words.filter(w => w.sentiment === 'negative').length;
-    const neutral = words.filter(w => w.sentiment === 'neutral').length;
+    const positive = normalizedWords.filter(w => w.sentiment === 'positive').length;
+    const negative = normalizedWords.filter(w => w.sentiment === 'negative').length;
+    const neutral = normalizedWords.filter(w => w.sentiment === 'neutral').length;
     
-    return { positive, negative, neutral, total: words.length };
+    return { positive, negative, neutral, total: normalizedWords.length };
   };
 
   const stats = getSentimentStats();
@@ -150,7 +180,7 @@ const WordCloud = ({ data, loading }) => {
               <p className="mt-2 text-muted">Analyzing your words...</p>
             </div>
           </div>
-        ) : words.length === 0 ? (
+        ) : normalizedWords.length === 0 ? (
           <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
             <div className="text-center">
               <i className="bi bi-cloud text-muted" style={{ fontSize: '3rem' }}></i>
@@ -161,7 +191,17 @@ const WordCloud = ({ data, loading }) => {
         ) : (
           <>
             {/* Word Cloud Visualization */}
-            <WordCloudVisualization words={filteredWords.slice(0, 25)} />
+            {filteredWords.length === 0 ? (
+              <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
+                <div className="text-center">
+                  <i className="bi bi-cloud text-muted" style={{ fontSize: '3rem' }}></i>
+                  <h5 className="mt-3 text-muted">No {filterType} words detected</h5>
+                  <p className="text-muted">Try switching filters to view other words.</p>
+                </div>
+              </div>
+            ) : (
+              <WordCloudVisualization words={filteredWords.slice(0, 25)} />
+            )}
 
             {/* Word List */}
             <WordList words={filteredWords} />
@@ -176,9 +216,9 @@ const WordCloud = ({ data, loading }) => {
                 <div className="row">
                   <div className="col-md-6">
                     <p className="mb-1">
-                      • Most used word: <strong style={{ color: words[0]?.color }}>
-                        {words[0]?.text}
-                      </strong> ({words[0]?.frequency} times)
+                      • Most used word: <strong style={{ color: normalizedWords[0]?.color }}>
+                        {normalizedWords[0]?.text}
+                      </strong> ({normalizedWords[0]?.frequency} times)
                     </p>
                     <p className="mb-1">
                       • Vocabulary richness: <strong>{stats.total} unique words</strong>
