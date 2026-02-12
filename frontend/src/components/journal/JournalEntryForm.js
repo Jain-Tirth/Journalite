@@ -14,7 +14,7 @@ import {
   InputGroup
 } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
-import { journalService } from '../../services/journalService';
+import { encryptedJournalService } from '../../services/encryptedJournalService';
 import { analyticsService } from '../../services/analyticsService';
 
 const JournalEntryForm = () => {
@@ -58,7 +58,7 @@ const JournalEntryForm = () => {
       setInitialLoading(true);
       setError('');
 
-      const response = await journalService.getEntry(id, currentUser.uid);
+      const response = await encryptedJournalService.getEntry(id, currentUser.uid);
 
       if (response.success && response.data) {
         const entry = response.data;
@@ -236,7 +236,7 @@ const JournalEntryForm = () => {
         const newImageUrls = [];
         for (const image of images) {
           try {
-            const uploadResult = await journalService.uploadImage(image, currentUser.uid, id);
+            const uploadResult = await encryptedJournalService.uploadImage(image, currentUser.uid, id);
             if (uploadResult.success) {
               newImageUrls.push(uploadResult.url);
             }
@@ -253,7 +253,7 @@ const JournalEntryForm = () => {
           images: allImages
         };
 
-        const result = await journalService.updateEntry(id, entryData, currentUser.uid);
+        const result = await encryptedJournalService.updateEntry(id, entryData, currentUser.uid);
 
         if (result.success) {
           setSuccess('Journal entry updated successfully!');
@@ -270,14 +270,16 @@ const JournalEntryForm = () => {
           images: [] // Will be updated with image URLs
         };
 
-        const result = await journalService.createEntry(entryData, currentUser.uid);
+        const result = await encryptedJournalService.createEntry(entryData, currentUser.uid);
 
-        if (result.success) {
+        const entryId = result.data?.id;
+
+        if (result.success && entryId) {
           // Upload images if any
           const imageUrls = [];
           for (const image of images) {
             try {
-              const uploadResult = await journalService.uploadImage(image, currentUser.uid, result.id);
+              const uploadResult = await encryptedJournalService.uploadImage(image, currentUser.uid, entryId);
               if (uploadResult.success) {
                 imageUrls.push(uploadResult.url);
               }
@@ -288,7 +290,7 @@ const JournalEntryForm = () => {
 
           // Update entry with image URLs if any were uploaded
           if (imageUrls.length > 0) {
-            await journalService.updateEntry(result.id, { images: imageUrls }, currentUser.uid);
+            await encryptedJournalService.updateEntry(entryId, { images: imageUrls }, currentUser.uid);
           }
 
           setSuccess('Journal entry created successfully!');

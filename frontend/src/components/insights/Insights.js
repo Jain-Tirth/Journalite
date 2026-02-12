@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
-import { journalService } from '../../services/journalService';
+import { encryptedJournalService } from '../../services/encryptedJournalService';
 import { analyticsService } from '../../services/analyticsService';
 import { JournalButton, JournalAlert } from '../ui/JournalComponents'; // eslint-disable-line no-unused-vars
 import EmotionDistribution from './EmotionDistribution';
@@ -46,7 +46,7 @@ const Insights = () => {
       }
 
       // Fetch all journal entries
-      const response = await journalService.getUserEntries(currentUser.uid);
+      const response = await encryptedJournalService.getUserEntries(currentUser.uid);
       if (response.success && response.data) {
         setEntries(response.data);
 
