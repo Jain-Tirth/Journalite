@@ -2,35 +2,37 @@
  * Unified Analytics Service for Journalite
  * 
  * This service consolidates all analytics functionality:
- *  AI-powered analysis using Google Gemini
+ *  AI-powered analysis using Groq AI
  * Architecture Decision:
- * We use Gemini AI as the primary analytics engine because it provides:
+ * We use Groq AI as the primary analytics engine because it provides:
  * - Superior contextual understanding
  * - No need for separate Python deployment
  * - Faster response times
  * - Lower infrastructure costs
  */
-
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 
 class AnalyticsService {
   constructor() {
-    // Initialize Gemini AI
-    this.apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+    // Initialize Groq AI
+    this.apiKey = process.env.REACT_APP_GROQ_API_KEY;
     this.isAIAvailable = !!this.apiKey;
     
     if (this.isAIAvailable) {
       try {
-        this.genAI = new GoogleGenerativeAI(this.apiKey);
-        // Use the stable gemini-pro model (not 1.5-pro)
-        this.model = this.genAI.getGenerativeModel({ 
-          model: "gemini-2.0-flash"
+        this.groq = new Groq({
+          apiKey: this.apiKey,
+          dangerouslyAllowBrowser: true // Required for browser usage
         });
-        console.log('✅ Gemini AI initialized successfully');
+        // Use a stable default model unless overridden
+        this.modelName = process.env.REACT_APP_GROQ_MODEL || "llama-3.1-8b-instant";
+        console.log('✅ Groq AI initialized successfully');
       } catch (error) {
-        console.error('❌ Error initializing Gemini AI:', error);
+        console.error('❌ Error initializing Groq AI:', error);
         this.isAIAvailable = false;
       } 
+    } else {
+      console.warn('⚠️ Groq API key not found; AI features will use fallbacks.');
     }
 
     // Python backend configuration (optional)
@@ -40,6 +42,27 @@ class AnalyticsService {
 
     // Cache configuration
     this.cacheTimeout = 30 * 60 * 1000; // 30 minutes
+  }
+
+  parseAiJsonResponse(responseText) {
+    if (!responseText) {
+      throw new Error('Empty AI response');
+    }
+
+    const cleanedText = responseText.replace(/```json\n?|\n?```/g, '').trim();
+    try {
+      return JSON.parse(cleanedText);
+    } catch (error) {
+      const firstBrace = cleanedText.indexOf('{');
+      const lastBrace = cleanedText.lastIndexOf('}');
+
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        const jsonCandidate = cleanedText.slice(firstBrace, lastBrace + 1);
+        return JSON.parse(jsonCandidate);
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -85,7 +108,7 @@ class AnalyticsService {
   }
 
   /**
-   * AI-powered mood analysis using Gemini
+   * AI-powered mood analysis using Groq
    */
   async analyzeMoodWithAI(text) {
     const prompt = `Analyze the emotional tone and mood of this journal entry with deep contextual understanding.
@@ -115,12 +138,21 @@ Guidelines:
 3. Detect nuanced emotions like jealousy, insecurity, or grief
 4. Evaluate the psychological state across the entire entry`;
 
-    const result = await this.model.generateContent(prompt);
-    const response = await result.response;
+    const response = await this.groq.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: this.modelName,
+      temperature: 0.7,
+      max_tokens: 1024
+    });
     
     try {
-      const cleanedText = response.text().replace(/```json\n?|\n?```/g, '').trim();
-      const moodData = JSON.parse(cleanedText);
+      const responseText = response.choices[0]?.message?.content || '';
+      const moodData = this.parseAiJsonResponse(responseText);
       
       return {
         success: true,
@@ -138,75 +170,75 @@ Guidelines:
     }
   }
 
-  // /**
-  //  * Client-side heuristic mood analysis
-  //  */
-  // analyzeMoodWithHeuristics(text) {
-  //   const moodKeywords = {
-  //     happy: ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'love', 'grateful', 'blessed'],
-  //     sad: ['sad', 'depressed', 'down', 'upset', 'crying', 'tears', 'lonely', 'hurt', 'miss'],
-  //     angry: ['angry', 'mad', 'furious', 'annoyed', 'frustrated', 'rage', 'hate', 'irritated'],
-  //     anxious: ['anxious', 'worried', 'nervous', 'stressed', 'panic', 'fear', 'scared', 'overwhelmed'],
-  //     excited: ['excited', 'thrilled', 'pumped', 'energetic', 'enthusiastic', 'can\'t wait'],
-  //     calm: ['calm', 'peaceful', 'relaxed', 'zen', 'tranquil', 'serene', 'content'],
-  //     grateful: ['grateful', 'thankful', 'blessed', 'appreciate', 'lucky', 'fortunate']
-  //   };
+  /**
+   * Client-side heuristic mood analysis
+   */
+  analyzeMoodWithHeuristics(text) {
+    const moodKeywords = {
+      happy: ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'love', 'grateful', 'blessed'],
+      sad: ['sad', 'depressed', 'down', 'upset', 'crying', 'tears', 'lonely', 'hurt', 'miss'],
+      angry: ['angry', 'mad', 'furious', 'annoyed', 'frustrated', 'rage', 'hate', 'irritated'],
+      anxious: ['anxious', 'worried', 'nervous', 'stressed', 'panic', 'fear', 'scared', 'overwhelmed'],
+      excited: ['excited', 'thrilled', 'pumped', 'energetic', 'enthusiastic', 'can\'t wait'],
+      calm: ['calm', 'peaceful', 'relaxed', 'zen', 'tranquil', 'serene', 'content'],
+      grateful: ['grateful', 'thankful', 'blessed', 'appreciate', 'lucky', 'fortunate']
+    };
 
-  //   const textLower = text.toLowerCase();
-  //   const moodScores = {};
-  //   let totalScore = 0;
+    const textLower = text.toLowerCase();
+    const moodScores = {};
+    let totalScore = 0;
 
-  //   // Calculate mood scores
-  //   for (const [mood, keywords] of Object.entries(moodKeywords)) {
-  //     const score = keywords.filter(keyword => textLower.includes(keyword)).length;
-  //     if (score > 0) {
-  //       moodScores[mood] = score;
-  //       totalScore += score;
-  //     }
-  //   }
+    // Calculate mood scores
+    for (const [mood, keywords] of Object.entries(moodKeywords)) {
+      const score = keywords.filter(keyword => textLower.includes(keyword)).length;
+      if (score > 0) {
+        moodScores[mood] = score;
+        totalScore += score;
+      }
+    }
 
-  //   // Determine primary mood
-  //   let primaryMood = 'neutral';
-  //   let confidence = 0.5;
-  //   let detectedKeywords = [];
+    // Determine primary mood
+    let primaryMood = 'neutral';
+    let confidence = 0.5;
+    let detectedKeywords = [];
 
-  //   if (totalScore > 0) {
-  //     primaryMood = Object.keys(moodScores).reduce((a, b) => 
-  //       moodScores[a] > moodScores[b] ? a : b
-  //     );
-  //     confidence = Math.min(0.8, 0.5 + (moodScores[primaryMood] * 0.1));
-  //     detectedKeywords = Object.keys(moodScores);
-  //   }
+    if (totalScore > 0) {
+      primaryMood = Object.keys(moodScores).reduce((a, b) => 
+        moodScores[a] > moodScores[b] ? a : b
+      );
+      confidence = Math.min(0.8, 0.5 + (moodScores[primaryMood] * 0.1));
+      detectedKeywords = Object.keys(moodScores);
+    }
 
-  //   // Calculate sentiment polarity
-  //   const positiveWords = ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'love', 'grateful'];
-  //   const negativeWords = ['sad', 'angry', 'frustrated', 'stressed', 'anxious', 'worried', 'upset'];
+    // Calculate sentiment polarity
+    const positiveWords = ['happy', 'joy', 'excited', 'great', 'amazing', 'wonderful', 'love', 'grateful'];
+    const negativeWords = ['sad', 'angry', 'frustrated', 'stressed', 'anxious', 'worried', 'upset'];
     
-  //   const positiveCount = positiveWords.filter(w => textLower.includes(w)).length;
-  //   const negativeCount = negativeWords.filter(w => textLower.includes(w)).length;
+    const positiveCount = positiveWords.filter(w => textLower.includes(w)).length;
+    const negativeCount = negativeWords.filter(w => textLower.includes(w)).length;
     
-  //   const polarity = totalScore > 0 
-  //     ? (positiveCount - negativeCount) / totalScore 
-  //     : 0;
+    const polarity = totalScore > 0 
+      ? (positiveCount - negativeCount) / totalScore 
+      : 0;
 
-  //   return {
-  //     success: true,
-  //     mood: primaryMood,
-  //     confidence,
-  //     emotions: {
-  //       primary: primaryMood,
-  //       secondary: Object.keys(moodScores).filter(m => m !== primaryMood).slice(0, 2),
-  //       intensity: confidence > 0.7 ? 'high' : confidence > 0.5 ? 'moderate' : 'low'
-  //     },
-  //     sentiment: {
-  //       polarity,
-  //       subjectivity: 0.5
-  //     },
-  //     keywords: detectedKeywords,
-  //     reasoning: 'Detected based on keyword analysis',
-  //     source: 'heuristics'
-  //   };
-  // }
+    return {
+      success: true,
+      mood: primaryMood,
+      confidence,
+      emotions: {
+        primary: primaryMood,
+        secondary: Object.keys(moodScores).filter(m => m !== primaryMood).slice(0, 2),
+        intensity: confidence > 0.7 ? 'high' : confidence > 0.5 ? 'moderate' : 'low'
+      },
+      sentiment: {
+        polarity,
+        subjectivity: 0.5
+      },
+      keywords: detectedKeywords,
+      reasoning: 'Detected based on keyword analysis',
+      source: 'heuristics'
+    };
+  }
 
   getDefaultMoodResult() {
     return {
@@ -280,12 +312,16 @@ Respond with ONLY valid JSON (no markdown):
 
 Analyze for emotional themes, intensity, patterns, and mental health indicators.`;
 
-    const result = await this.model.generateContent(prompt);
-    const response = await result.response;
+    const response = await this.groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: this.modelName,
+      temperature: 0.7,
+      max_tokens: 2048
+    });
     
     try {
-      const cleanedText = response.text().replace(/```json\n?|\n?```/g, '').trim();
-      const analysis = JSON.parse(cleanedText);
+      const responseText = response.choices[0]?.message?.content || '';
+      const analysis = this.parseAiJsonResponse(responseText);
       
       return {
         success: true,
@@ -389,12 +425,16 @@ Respond with JSON (no markdown):
 Focus on emotionally significant words, psychological indicators, and personal growth themes.
 Exclude common stop words.`;
 
-    const result = await this.model.generateContent(prompt);
-    const response = await result.response;
+    const response = await this.groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: this.modelName,
+      temperature: 0.7,
+      max_tokens: 2048
+    });
     
     try {
-      const cleanedText = response.text().replace(/```json\n?|\n?```/g, '').trim();
-      const wordCloudData = JSON.parse(cleanedText);
+      const responseText = response.choices[0]?.message?.content || '';
+      const wordCloudData = this.parseAiJsonResponse(responseText);
       
       return {
         success: true,
@@ -939,6 +979,18 @@ Exclude common stop words.`;
    * ============================================
    */
 
+  getFallbackSuggestion() {
+    const suggestions = [
+      'Try writing about one small win you had today and how it made you feel.',
+      'What is one thing you are grateful for right now, and why does it matter to you?',
+      'Describe a challenge you faced today and how you handled it.',
+      'Write about a person or place that made you feel calm recently.',
+      'What is one goal for tomorrow that feels achievable and meaningful?'
+    ];
+
+    return suggestions[Math.floor(Math.random() * suggestions.length)];
+  }
+
   /**
    * Get AI-powered journaling suggestions and prompts
    */
@@ -954,9 +1006,13 @@ Content: "${content}"
 
 Provide a thoughtful suggestion, reflection question, or writing prompt to help the user explore their thoughts deeper. Keep it encouraging and insightful. Limit to 2-3 sentences.`;
 
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      return response.text().trim();
+      const response = await this.groq.chat.completions.create({
+        messages: [{ role: "user", content: prompt }],
+        model: this.modelName,
+        temperature: 0.8,
+        max_tokens: 256
+      });
+      return response.choices[0]?.message?.content?.trim() || this.getFallbackSuggestion();
     } catch (error) {
       console.error('❌ AI suggestion failed:', error);
       return this.getFallbackSuggestion();
