@@ -3,9 +3,10 @@ import { Card, Spinner, ButtonGroup, Button, Badge } from 'react-bootstrap';
 
 const WordCloud = ({ data, loading }) => {
   const [filterType, setFilterType] = useState('all'); // 'all', 'positive', 'negative'
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const words = Array.isArray(data) ? data : [];
-  console.log('🎨 WordCloud received data:', words.length > 0 ? `${words.length} words` : 'no data');
+  console.log('WordCloud received data:', words.length > 0 ? `${words.length} words` : 'no data');
 
   const positiveLexicon = new Set([
     'happy', 'joy', 'love', 'excited', 'great', 'amazing', 'wonderful', 'grateful', 'success', 'achieved',
@@ -44,13 +45,13 @@ const WordCloud = ({ data, loading }) => {
     return true;
   });
 
-  // Calculate word positions for cloud layout
   const getWordPosition = (index, total) => {
-    const angle = (index / total) * 2 * Math.PI;
-    const radius = 50 + (index % 3) * 30;
+    const turn = 0.5 + index / Math.max(total, 1);
+    const angle = turn * 6 * Math.PI;
+    const radius = 10 + index * (90 / Math.max(total, 1));
     const centerX = 50;
     const centerY = 50;
-    
+
     return {
       x: centerX + Math.cos(angle) * radius,
       y: centerY + Math.sin(angle) * radius
@@ -58,16 +59,47 @@ const WordCloud = ({ data, loading }) => {
   };
 
   const WordCloudVisualization = ({ words }) => {
+    const sortedWords = [...words]
+      .sort((a, b) => (b.frequency || 0) - (a.frequency || 0));
+
+    const maxFrequency = Math.max(...sortedWords.map(word => word.frequency || 1), 1);
+    const minFrequency = Math.min(...sortedWords.map(word => word.frequency || 1), 1);
+
+    const getScaledSize = (frequency, baseSize) => {
+      if (maxFrequency === minFrequency) return baseSize + 8;
+      const scale = (frequency - minFrequency) / (maxFrequency - minFrequency);
+      return baseSize + 8 + scale * 16;
+    };
+
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+    const viewBoxWidth = 800;
+    const viewBoxHeight = 400;
+    const paddingX = 70;
+    const paddingY = 50;
+
     return (
       <div
         className="position-relative d-flex align-items-center justify-content-center"
-        style={{ height: '400px', overflow: 'hidden' }}
+        style={{
+          height: '400px',
+          overflow: 'hidden',
+          borderRadius: '16px',
+          background: 'radial-gradient(circle at 20% 20%, rgba(var(--bs-primary-rgb), 0.18), transparent 55%), radial-gradient(circle at 80% 80%, rgba(var(--bs-success-rgb), 0.18), transparent 55%), var(--bg-secondary)'
+        }}
       >
-        <svg width="100%" height="100%" viewBox="0 0 800 400">
-          {words.map((word, index) => {
-            const position = getWordPosition(index, words.length);
-            const x = (position.x / 100) * 800;
-            const y = (position.y / 100) * 400;
+        <svg width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="wordGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="rgba(0,0,0,0.35)" />
+            </filter>
+          </defs>
+          {sortedWords.map((word, index) => {
+            const position = getWordPosition(index, sortedWords.length);
+            const fontSize = Math.min(34, getScaledSize(word.frequency || 1, Math.max(12, word.size || 16)));
+            const rotation = (index % 5 === 0 ? -8 : index % 7 === 0 ? 8 : 0);
+            const x = clamp((position.x / 100) * viewBoxWidth, paddingX, viewBoxWidth - paddingX);
+            const y = clamp((position.y / 100) * viewBoxHeight, paddingY, viewBoxHeight - paddingY);
+            const isHovered = hoveredIndex === index;
 
             return (
               <text
@@ -76,22 +108,25 @@ const WordCloud = ({ data, loading }) => {
                 y={y}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fontSize={Math.max(14, word.size || 20)}
+                fontSize={fontSize}
                 fill={word.color}
-                fontWeight="600"
+                fontWeight={isHovered ? '700' : fontSize > 28 ? '700' : '600'}
                 className="word-cloud-text"
                 style={{
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.25s ease',
+                  textShadow: isHovered ? '0 2px 10px rgba(0, 0, 0, 0.45)' : '0 1px 6px rgba(0, 0, 0, 0.35)',
+                  opacity: isHovered ? 0.95 : 1,
+                  letterSpacing: isHovered ? '0.4px' : '0'
                 }}
+                transform={`rotate(${rotation}, ${x}, ${y})`}
                 onMouseEnter={(e) => {
-                  e.target.style.fontSize = `${Math.max(14, word.size || 20) + 6}px`;
-                  e.target.style.opacity = '0.8';
+                  setHoveredIndex(index);
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.fontSize = `${Math.max(14, word.size || 20)}px`;
-                  e.target.style.opacity = '1';
+                  setHoveredIndex(null);
                 }}
+                filter={isHovered ? 'url(#wordGlow)' : undefined}
               >
                 {word.text}
               </text>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Spinner, Row, Col, ProgressBar } from 'react-bootstrap';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
 
 const WritingPatterns = ({ data, loading }) => {
 
@@ -35,6 +35,9 @@ const WritingPatterns = ({ data, loading }) => {
     day,
     count: weeklyDataMap[day] || 0
   }));
+
+  const weeklyTotal = weeklyData.reduce((sum, item) => sum + item.count, 0);
+  const weeklyAverage = weeklyData.length > 0 ? weeklyTotal / weeklyData.length : 0;
 
   // Removed unused timeColors variable
 
@@ -142,18 +145,25 @@ const WritingPatterns = ({ data, loading }) => {
             {/* Weekly Pattern Chart */}
             <div className="mb-4">
               <h6 className="text-secondary mb-3">Weekly Writing Pattern</h6>
-              <div style={{ height: '180px' }}>
+              <div style={{ height: '200px' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={weeklyData} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                  <BarChart data={weeklyData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
+                    <defs>
+                      <linearGradient id="weeklyBar" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.95} />
+                        <stop offset="100%" stopColor="var(--primary)" stopOpacity={0.55} />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                    <YAxis tick={{ fontSize: 12 }} allowDecimals={false} domain={[0, 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Bar
-                      dataKey="count"
-                      fill="#3B82F6"
-                      radius={[4, 4, 0, 0]}
-                    />
+                    <ReferenceLine y={weeklyAverage} stroke="var(--secondary)" strokeDasharray="4 4" />
+                    <Bar dataKey="count" fill="url(#weeklyBar)" radius={[6, 6, 0, 0]}>
+                      {weeklyData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fillOpacity={entry.count === 0 ? 0.35 : 1} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
