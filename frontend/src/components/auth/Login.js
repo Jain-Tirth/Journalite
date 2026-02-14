@@ -18,6 +18,7 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -64,12 +65,28 @@ const Login = () => {
 
                     <div className="mb-3">
                       <label htmlFor="password" className="form-label">Password</label>
-                      <Field
-                        type="password"
-                        name="password"
-                        className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
-                      />
+                      <div className="input-group">
+                        <Field
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
+                        />
+                        <button
+                          className="btn btn-link password-toggle"
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                          <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                        </button>
+                      </div>
                       <ErrorMessage name="password" component="div" className="invalid-feedback" />
+                    </div>
+
+                    <div className="mb-3 text-end">
+                      <Link to="/forgot-password" className="text-decoration-none">
+                        Forgot password?
+                      </Link>
                     </div>
 
                     <div className="d-grid gap-2">

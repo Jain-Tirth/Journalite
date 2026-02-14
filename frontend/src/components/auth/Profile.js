@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Card, Button, Form, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Alert, InputGroup } from 'react-bootstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
@@ -21,9 +21,12 @@ const ProfileSchema = Yup.object().shape({
 });
 
 const Profile = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser } = useAuth();
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -109,14 +112,25 @@ const Profile = () => {
 
                     <Form.Group className="mb-3">
                       <Form.Label>Current Password</Form.Label>
-                      <Form.Control
-                        type="password"
-                        name="currentPassword"
-                        value={values.currentPassword}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        isInvalid={touched.currentPassword && errors.currentPassword}
-                      />
+                      <InputGroup>
+                        <Form.Control
+                          type={showCurrentPassword ? 'text' : 'password'}
+                          name="currentPassword"
+                          value={values.currentPassword}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          isInvalid={touched.currentPassword && errors.currentPassword}
+                        />
+                        <Button
+                          variant="link"
+                          className="password-toggle"
+                          type="button"
+                          onClick={() => setShowCurrentPassword((prev) => !prev)}
+                          aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+                        >
+                          <i className={`bi ${showCurrentPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                        </Button>
+                      </InputGroup>
                       <Form.Control.Feedback type="invalid">
                         {errors.currentPassword}
                       </Form.Control.Feedback>
@@ -124,14 +138,25 @@ const Profile = () => {
 
                     <Form.Group className="mb-3">
                       <Form.Label>New Password</Form.Label>
-                      <Form.Control
-                        type="password"
-                        name="newPassword"
-                        value={values.newPassword}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        isInvalid={touched.newPassword && errors.newPassword}
-                      />
+                      <InputGroup>
+                        <Form.Control
+                          type={showNewPassword ? 'text' : 'password'}
+                          name="newPassword"
+                          value={values.newPassword}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          isInvalid={touched.newPassword && errors.newPassword}
+                        />
+                        <Button
+                          variant="link"
+                          className="password-toggle"
+                          type="button"
+                          onClick={() => setShowNewPassword((prev) => !prev)}
+                          aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                        >
+                          <i className={`bi ${showNewPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                        </Button>
+                      </InputGroup>
                       <Form.Control.Feedback type="invalid">
                         {errors.newPassword}
                       </Form.Control.Feedback>
@@ -139,14 +164,25 @@ const Profile = () => {
 
                     <Form.Group className="mb-3">
                       <Form.Label>Confirm New Password</Form.Label>
-                      <Form.Control
-                        type="password"
-                        name="confirmNewPassword"
-                        value={values.confirmNewPassword}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        isInvalid={touched.confirmNewPassword && errors.confirmNewPassword}
-                      />
+                      <InputGroup>
+                        <Form.Control
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          name="confirmNewPassword"
+                          value={values.confirmNewPassword}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          isInvalid={touched.confirmNewPassword && errors.confirmNewPassword}
+                        />
+                        <Button
+                          variant="link"
+                          className="password-toggle"
+                          type="button"
+                          onClick={() => setShowConfirmPassword((prev) => !prev)}
+                          aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                        >
+                          <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                        </Button>
+                      </InputGroup>
                       <Form.Control.Feedback type="invalid">
                         {errors.confirmNewPassword}
                       </Form.Control.Feedback>
