@@ -107,6 +107,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const resetPassword = async (email) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await authService.resetPassword(email);
+      return { success: true };
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send password reset email');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const isAdmin = () => {
     return currentUser?.role === 'ADMIN';
   };
@@ -117,6 +131,7 @@ export const AuthProvider = ({ children }) => {
     error,
     login,
     register,
+    resetPassword,
     logout,
     isAdmin,
   };

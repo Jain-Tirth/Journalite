@@ -7,10 +7,38 @@ import {
     updateEmail,
     updatePassword,
     EmailAuthProvider,
-    reauthenticateWithCredential
+    reauthenticateWithCredential,
+    sendPasswordResetEmail
 } from "firebase/auth";
 
 import { auth } from "./firebase";
+
+const getFriendlyAuthMessage = (error, fallbackMessage) => {
+    const code = error?.code;
+
+    switch (code) {
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+            return 'You entered an invalid email or password.';
+        case 'auth/invalid-email':
+            return 'Please enter a valid email address.';
+        case 'auth/user-disabled':
+            return 'This account is disabled. Please contact support.';
+        case 'auth/too-many-requests':
+            return 'Too many attempts. Please wait a moment and try again.';
+        case 'auth/email-already-in-use':
+            return 'An account already exists with this email.';
+        case 'auth/weak-password':
+            return 'Please choose a stronger password (at least 6 characters).';
+        case 'auth/requires-recent-login':
+            return 'Please log in again to update your profile.';
+        case 'auth/network-request-failed':
+            return 'Network error. Please check your connection and try again.';
+        default:
+            return fallbackMessage;
+    }
+};
 
 export const firebaseAuthService = {
     register: async (userData) => {
@@ -47,7 +75,10 @@ export const firebaseAuthService = {
             console.error('❌ Registration error:', error);
             console.error('Error code:', error.code);
             console.error('Error message:', error.message);
-            throw { response: { data: { message: error.message } } };
+            const message = getFriendlyAuthMessage(error, 'Unable to create your account. Please try again.');
+            const friendlyError = new Error(message);
+            friendlyError.response = { data: { message } };
+            throw friendlyError;
         }
     },
 
@@ -85,7 +116,10 @@ export const firebaseAuthService = {
             console.error('❌ Login error:', error);
             console.error('Error code:', error.code);
             console.error('Error message:', error.message);
-            throw { response: { data: { message: error.message } } };
+            const message = getFriendlyAuthMessage(error, 'Unable to log you in. Please try again.');
+            const friendlyError = new Error(message);
+            friendlyError.response = { data: { message } };
+            throw friendlyError;
         }
     },
 
@@ -94,7 +128,10 @@ export const firebaseAuthService = {
             await signOut(auth);
             return { success: true };
         } catch (error) {
-            throw { response: { data: { message: error.message } } };
+            const message = getFriendlyAuthMessage(error, 'Unable to log out. Please try again.');
+            const friendlyError = new Error(message);
+            friendlyError.response = { data: { message } };
+            throw friendlyError;
         }
     },
 
@@ -161,7 +198,22 @@ export const firebaseAuthService = {
 
             return { data: { success: true } };
         } catch (error) {
-            throw { response: { data: { message: error.message } } };
+            const message = getFriendlyAuthMessage(error, 'Unable to update your profile. Please try again.');
+            const friendlyError = new Error(message);
+            friendlyError.response = { data: { message } };
+            throw friendlyError;
+        }
+    },
+
+    resetPassword: async (email) => {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            return { data: { success: true } };
+        } catch (error) {
+            const message = getFriendlyAuthMessage(error, 'Unable to send reset link. Please try again.');
+            const friendlyError = new Error(message);
+            friendlyError.response = { data: { message } };
+            throw friendlyError;
         }
     }
 }
