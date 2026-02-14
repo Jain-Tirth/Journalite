@@ -1,6 +1,6 @@
 #  Journalite - AI-Powered Digital Journal
 
-A modern, secure, and intelligent journaling application with AI-powered mood analysis and comprehensive insights. Built with React 19 frontend, Google Gemini AI integration, and Python analytics backend with end-to-end encryption.
+A modern, secure, and intelligent journaling application with AI-powered mood analysis and comprehensive insights. Built with React 19 frontend, Groq AI integration, and Python analytics backend with end-to-end encryption.
 
 ## Project Structure
 
@@ -35,7 +35,7 @@ journalite/
 - **Search Functionality**: Find entries quickly with powerful search
 
 ###  AI-Powered Intelligence
-- **Automatic Mood Detection**: Google Gemini AI analyzes your writing to detect emotions
+- **Automatic Mood Detection**: Groq AI analyzes your writing to detect emotions
 - **Unified Analytics Service**: Single service architecture for all analytics (AI → Python → Heuristics fallback)
 - **Sentiment Tracking**: Monitor your emotional well-being over time with interactive charts
 - **Emotion Distribution**: Comprehensive breakdown of your emotional states
@@ -88,14 +88,14 @@ journalite/
 - **Firebase SDK v11** - Authentication, Firestore, and Storage
 - **Recharts** - Beautiful data visualization charts
 - **CryptoJS** - AES encryption for client-side security
-- **Google Generative AI SDK** - Gemini AI integration
+- **Groq AI SDK** - Groq AI integration
 - **Axios** - HTTP client for API requests
 - **React Context API** - State management for auth and theme
 
 ### Backend (Python)
 - **Flask** - Lightweight web framework for analytics API
 - **Firebase Admin SDK** - Server-side Firebase integration
-- **Google Generative AI (Gemini 2.0)** - Advanced language model for mood analysis
+- **Groq AI (llama-3.3-70b-versatile)** - Advanced language model for mood analysis
 - **Transformers** - Hugging Face ML models for NLP
 - **NLTK & TextBlob** - Natural language processing tools
 - **NumPy & Pandas** - Data analysis and manipulation
@@ -138,7 +138,7 @@ cd frontend && npm install
 4. Set up environment variables
 Create a `.env` file in the `frontend/` directory:
 ```
-REACT_APP_GEMINI_API_KEY=your-gemini-api-key
+REACT_APP_GROQ_API_KEY=your-groq-api-key
 REACT_APP_PYTHON_API_URL=http://localhost:8080
 ```
 
@@ -177,55 +177,6 @@ Deploy Firestore rules and indexes:
 npm run deploy:firestore
 ```
 
-##  Legacy Project Structure (for reference)
-
-```
-journalite/
-├── src/                          # React frontend source (MOVED TO frontend/src/)
-│   ├── components/              # React components
-│   │   ├── auth/               # Login, Register, Profile, ProtectedRoute
-│   │   ├── journal/            # JournalList, JournalDetail, JournalEntryForm
-│   │   ├── insights/           # Analytics components
-│   │   │   ├── Insights.js     # Main insights dashboard
-│   │   │   ├── EmotionDistribution.js
-│   │   │   ├── SentimentAnalysis.js
-│   │   │   ├── EmotionsOverTime.js
-│   │   │   ├── WordCloud.js
-│   │   │   ├── WritingPatterns.js
-│   │   │   └── MoodCorrelations.js
-│   │   ├── layout/             # Navbar, ThemeToggle, Unauthorized
-│   │   └── ui/                 # JournalComponents (reusable UI)
-│   ├── context/                # React context providers
-│   │   ├── AuthContext.js      # Authentication state
-│   │   └── ThemeContext.js     # Theme management
-│   ├── services/               # API and service layer
-│   │   ├── analyticsService.js # Unified analytics service 
-│   │   ├── journalService.js   # Journal CRUD operations
-│   │   ├── fieldEncryption.js  # AES encryption/decryption
-│   │   ├── firebase.js         # Firebase configuration
-│   │   └── firebaseAuth.js     # Auth helpers
-│   ├── styles/                 # CSS and styling
-│   │   ├── theme.css           # Main theme
-│   │   └── journaling-theme.css # Journal-specific styles
-│   └── utils/                  # Utility functions
-├── python-analytics/           # Python backend
-│   ├── services/              # Core business logic
-│   │   ├── analytics_engine.py # Main analytics engine
-│   │   ├── firebase_service.py # Firebase integration
-│   │   └── mood_detector.py    # AI mood detection
-│   ├── app.py                 # Flask application entry point
-│   ├── requirements.txt       # Python dependencies
-│   └── Dockerfile            # Container configuration
-├── public/                     # Static assets (MOVED TO frontend/public/)
-│   ├── index.html            # HTML template
-│   └── manifest.json         # PWA manifest
-├── build/                      # Production build output (MOVED TO frontend/build/)
-├── firebase.json              # Firebase configuration (UPDATED with new paths)
-├── firestore.rules           # Firestore security rules (MOVED TO backend/)
-├── storage.rules             # Storage security rules (MOVED TO backend/)
-└── package.json              # Node.js dependencies (NOW at frontend/package.json)
-```
-
 ##  Analytics Architecture
 
 3. **Configure environment**
@@ -238,7 +189,7 @@ journalite/
    REACT_APP_FIREBASE_STORAGE_BUCKET=your-app.appspot.com
    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
    REACT_APP_FIREBASE_APP_ID=your-app-id
-   REACT_APP_GOOGLE_AI_API_KEY=your-gemini-api-key
+   REACT_APP_GROQ_API_KEY=your-groq-api-key
    REACT_APP_PYTHON_API_URL=http://localhost:5000
    ```
 
@@ -284,13 +235,13 @@ journalite/
    export GOOGLE_APPLICATION_CREDENTIALS="path/to/serviceAccountKey.json"
    ```
 
-5. **Set Google AI API Key**
+5. **Set Groq API Key**
    ```bash
    # Windows PowerShell
-   $env:GOOGLE_AI_API_KEY="your-gemini-api-key"
+   $env:GROQ_API_KEY="your-groq-api-key"
    
    # macOS/Linux
-   export GOOGLE_AI_API_KEY="your-gemini-api-key"
+   export GROQ_API_KEY="your-groq-api-key"
    ```
 
 5. **Start the Flask server**
@@ -307,7 +258,7 @@ User Input → Insights Component → analyticsService.js
                                          ↓
                          ┌───────────────┴───────────────┐
                          │                               │
-                    Gemini AI                    Python Backend
+                    Groq AI                      Python Backend
                   (Primary Method)              (Fallback Option)
                          │                               │
                          └───────────────┬───────────────┘
@@ -363,8 +314,8 @@ REACT_APP_FIREBASE_STORAGE_BUCKET=your-app.appspot.com
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 REACT_APP_FIREBASE_APP_ID=your-app-id
 
-# Google AI (Gemini)
-REACT_APP_GOOGLE_AI_API_KEY=your-gemini-api-key
+# Groq AI API
+REACT_APP_GROQ_API_KEY=your-groq-api-key
 
 # Python Backend URL (optional - for fallback analytics)
 REACT_APP_PYTHON_API_URL=http://localhost:5000
@@ -376,7 +327,7 @@ REACT_APP_PYTHON_API_URL=http://localhost:5000
 GOOGLE_APPLICATION_CREDENTIALS=path/to/serviceAccountKey.json
 
 # Google AI API
-GOOGLE_AI_API_KEY=your-gemini-api-key
+GROQ_API_KEY=your-groq-api-key
 
 # Flask Configuration
 FLASK_ENV=development
