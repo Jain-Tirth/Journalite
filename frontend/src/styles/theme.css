@@ -1,47 +1,48 @@
 /* Journalite Theme Variables */
 
+/* Journalite Theme Variables */
 :root {
   /* Primary Colors */
-  --primary-color: #6366f1;
-  --primary-light: #818cf8;
-  --primary-dark: #4f46e5;
-  
+  --primary-color: #0f766e;
+  --primary-light: #1f9b90;
+  --primary-dark: #0b5f59;
+
   /* Secondary Colors */
-  --secondary-color: #64748b;
-  --secondary-light: #94a3b8;
-  --secondary-dark: #475569;
-  
+  --secondary-color: #b45309;
+  --secondary-light: #d97706;
+  --secondary-dark: #92400e;
+
   /* Success Colors */
-  --success-color: #10b981;
-  --success-light: #34d399;
-  --success-dark: #059669;
-  
+  --success-color: #15803d;
+  --success-light: #22c55e;
+  --success-dark: #166534;
+
   /* Warning Colors */
-  --warning-color: #f59e0b;
-  --warning-light: #fbbf24;
-  --warning-dark: #d97706;
-  
+  --warning-color: #b45309;
+  --warning-light: #f59e0b;
+  --warning-dark: #92400e;
+
   /* Error Colors */
-  --error-color: #ef4444;
-  --error-light: #f87171;
-  --error-dark: #dc2626;
-  
+  --error-color: #b91c1c;
+  --error-light: #ef4444;
+  --error-dark: #7f1d1d;
+
   /* Info Colors */
-  --info-color: #3b82f6;
-  --info-light: #60a5fa;
-  --info-dark: #2563eb;
-  
+  --info-color: #0e7490;
+  --info-light: #22d3ee;
+  --info-dark: #155e75;
+
   /* Neutral Colors */
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1e293b;
-  --gray-900: #0f172a;
+  --gray-50: #faf7f2;
+  --gray-100: #f3eee7;
+  --gray-200: #e8dfd3;
+  --gray-300: #d7cabc;
+  --gray-400: #b9a999;
+  --gray-500: #8f7f73;
+  --gray-600: #6d6056;
+  --gray-700: #4f4440;
+  --gray-800: #362f2c;
+  --gray-900: #1f1a18;
   
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -65,7 +66,8 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   
   /* Typography */
-  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-family-sans: 'Manrope', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-family-display: 'Fraunces', 'Georgia', 'Times New Roman', serif;
   --font-family-mono: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Source Code Pro', monospace;
   
   /* Font Sizes */
@@ -110,46 +112,26 @@
 /* Light Theme Overrides */
 [data-bs-theme="light"] {
   --bs-primary: var(--primary-color);
-  --bs-primary-rgb: 99, 102, 241;
+  --bs-primary-rgb: 15, 118, 110;
   --bs-secondary: var(--secondary-color);
-  --bs-secondary-rgb: 100, 116, 139;
+  --bs-secondary-rgb: 180, 83, 9;
   --bs-success: var(--success-color);
-  --bs-success-rgb: 16, 185, 129;
+  --bs-success-rgb: 21, 128, 61;
   --bs-info: var(--info-color);
-  --bs-info-rgb: 59, 130, 246;
+  --bs-info-rgb: 14, 116, 144;
   --bs-warning: var(--warning-color);
-  --bs-warning-rgb: 245, 158, 11;
+  --bs-warning-rgb: 180, 83, 9;
   --bs-danger: var(--error-color);
-  --bs-danger-rgb: 239, 68, 68;
+  --bs-danger-rgb: 185, 28, 28;
   --bs-light: var(--gray-100);
-  --bs-light-rgb: 241, 245, 249;
+  --bs-light-rgb: 243, 238, 231;
   --bs-dark: var(--gray-800);
-  --bs-dark-rgb: 30, 41, 59;
-}
-
-/* Dark Theme Overrides */
-[data-bs-theme="dark"] {
-  --bs-primary: var(--primary-light);
-  --bs-primary-rgb: 129, 140, 248;
-  --bs-secondary: var(--secondary-light);
-  --bs-secondary-rgb: 148, 163, 184;
-  --bs-success: var(--success-light);
-  --bs-success-rgb: 52, 211, 153;
-  --bs-info: var(--info-light);
-  --bs-info-rgb: 96, 165, 250;
-  --bs-warning: var(--warning-light);
-  --bs-warning-rgb: 251, 191, 36;
-  --bs-danger: var(--error-light);
-  --bs-danger-rgb: 248, 113, 113;
-  --bs-light: var(--gray-700);
-  --bs-light-rgb: 51, 65, 85;
-  --bs-dark: var(--gray-200);
-  --bs-dark-rgb: 226, 232, 240;
+  --bs-dark-rgb: 54, 47, 44;
 }
 
 /* Utility Classes */
 .text-gradient {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -188,18 +170,6 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gray-500);
-}
-
-[data-bs-theme="dark"] ::-webkit-scrollbar-track {
-  background: var(--gray-800);
-}
-
-[data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: var(--gray-600);
-}
-
-[data-bs-theme="dark"] ::-webkit-scrollbar-thumb:hover {
   background: var(--gray-500);
 }
 
