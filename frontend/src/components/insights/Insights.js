@@ -11,6 +11,7 @@ import WordCloud from './WordCloud';
 import WritingPatterns from './WritingPatterns';
 import MoodCorrelations from './MoodCorrelations';
 import { fieldEncryptionService } from '../../services/fieldEncryption';
+import JournaliteLoader from '../ui/JournaliteLoader';
 
 const Insights = () => {
   const { currentUser } = useAuth();
@@ -127,10 +128,7 @@ const Insights = () => {
     return (
       <Container className="mt-4">
         <div className="journal-loading text-center py-5">
-          <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }} role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <h4 className="mt-4" style={{ color: 'var(--text-primary)' }}>Loading Your Journal Insights</h4>
+          <JournaliteLoader message="Loading your journal insights..." />
         </div>
       </Container>
     );

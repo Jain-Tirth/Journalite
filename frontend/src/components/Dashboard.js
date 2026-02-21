@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Alert, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import { journalService } from '../services/journalService';
 import { encryptedJournalService } from '../services/encryptedJournalService';
 import { formatReadableDate } from '../utils/taskUtils';
 import { useAuth } from '../context/AuthContext';
+import JournaliteLoader from './ui/JournaliteLoader';
 const Dashboard = () => {
   const { currentUser } = useAuth();
   const [entries, setEntries] = useState([]);
@@ -72,10 +73,7 @@ const Dashboard = () => {
     return (
       <Container className="mt-4">
         <div className="text-center">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-          <p className="mt-2">Loading your journal dashboard...</p>
+          <JournaliteLoader message="Loading your journal dashboard..." />
         </div>
       </Container>
     );
