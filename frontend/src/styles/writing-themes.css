@@ -1,0 +1,876 @@
+/* ================================================================
+   JOURNALITE WRITING THEMES
+   ================================================================
+   Six immersive themes designed to set the mood while journaling.
+   Each theme transforms the editor background, text feel, 
+   borders, buttons, and adds subtle atmospheric effects.
+   ================================================================ */
+
+/* ── Theme Picker Bar ──────────────────────────────────────────── */
+
+.writing-theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.writing-theme-picker::-webkit-scrollbar {
+  display: none;
+}
+
+.writing-theme-picker-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7a80);
+  white-space: nowrap;
+  margin-right: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.writing-theme-picker-label i {
+  font-size: 1rem;
+}
+
+/* ── Theme Swatch Button ──────────────────────────────────────── */
+
+.theme-swatch {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.theme-swatch:hover {
+  transform: scale(1.18) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.theme-swatch.active {
+  border-color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2), 0 0 0 2.5px var(--swatch-ring, #666);
+}
+
+.theme-swatch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 70%);
+  transition: opacity 0.3s ease;
+}
+
+.theme-swatch:hover::after {
+  opacity: 1;
+}
+
+/* Swatch Tooltip */
+
+.theme-swatch-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.theme-swatch-name {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted, #96a1a7);
+  white-space: nowrap;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.25s ease;
+}
+
+.theme-swatch-wrapper:hover .theme-swatch-name,
+.theme-swatch-wrapper .theme-swatch.active + .theme-swatch-name {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ── Individual Swatch Colors ─────────────────────────────────── */
+
+.theme-swatch--serenity {
+  background: linear-gradient(145deg, #f0f7ff, #dce8f5, #f7f9fc);
+  --swatch-ring: #94b8db;
+}
+
+.theme-swatch--sacred-grove {
+  background: linear-gradient(145deg, #1a3c2a, #2d6a4f, #b7a94e);
+  --swatch-ring: #52b788;
+}
+
+.theme-swatch--midnight-cosmos {
+  background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
+  --swatch-ring: #7c83c7;
+}
+
+.theme-swatch--golden-hour {
+  background: linear-gradient(145deg, #f7d794, #e77f67, #fce4b8);
+  --swatch-ring: #e77f67;
+}
+
+.theme-swatch--rose-quartz {
+  background: linear-gradient(145deg, #f4c2c2, #d4a0a0, #f9e4e4);
+  --swatch-ring: #c88c8c;
+}
+
+.theme-swatch--ocean-deep {
+  background: linear-gradient(145deg, #0a3d62, #38ada9, #1e6f8e);
+  --swatch-ring: #38ada9;
+}
+
+/* ================================================================
+   THEME 1: SERENITY 🕊️
+   Meaning: Peace, clarity, stillness of mind
+   Feel: Like writing on a cloud at dawn
+   ================================================================ */
+
+.writing-theme-serenity {
+  --wt-bg: linear-gradient(170deg, #f6f9ff 0%, #eaf1fb 35%, #f3f6fc 70%, #fdfeff 100%);
+  --wt-card-bg: rgba(255, 255, 255, 0.92);
+  --wt-card-border: rgba(188, 210, 238, 0.45);
+  --wt-text: #2c3e50;
+  --wt-text-muted: #7f9ab5;
+  --wt-heading: #1a365d;
+  --wt-accent: #5a9bcf;
+  --wt-accent-light: rgba(90, 155, 207, 0.12);
+  --wt-input-bg: rgba(240, 247, 255, 0.7);
+  --wt-input-border: rgba(188, 210, 238, 0.5);
+  --wt-input-focus-border: #5a9bcf;
+  --wt-input-focus-shadow: rgba(90, 155, 207, 0.2);
+  --wt-btn-bg: linear-gradient(135deg, #5a9bcf 0%, #4a8abf 100%);
+  --wt-btn-hover: linear-gradient(135deg, #4a8abf 0%, #3a7aaf 100%);
+  --wt-placeholder: #a8c4de;
+  --wt-selection-bg: rgba(90, 155, 207, 0.2);
+  --wt-tag-bg: rgba(90, 155, 207, 0.12);
+  --wt-tag-color: #3a7aaf;
+  --wt-divider: rgba(188, 210, 238, 0.3);
+}
+
+.writing-theme-serenity .journal-form-themed {
+  background: var(--wt-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle floating cloud shapes */
+.writing-theme-serenity .journal-form-themed::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -40px;
+  width: 280px;
+  height: 180px;
+  background: radial-gradient(ellipse, rgba(188, 210, 238, 0.25), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: serenity-float 12s ease-in-out infinite;
+}
+
+.writing-theme-serenity .journal-form-themed::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: -30px;
+  width: 220px;
+  height: 140px;
+  background: radial-gradient(ellipse, rgba(220, 232, 245, 0.35), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: serenity-float 15s ease-in-out infinite reverse;
+}
+
+@keyframes serenity-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-15px) translateX(8px); }
+}
+
+
+/* ================================================================
+   THEME 2: SACRED GROVE 🌿
+   Meaning: Growth, healing, spiritual renewal
+   Feel: Writing in a sunlit forest clearing
+   ================================================================ */
+
+.writing-theme-sacred-grove {
+  --wt-bg: linear-gradient(170deg, #1a2e1a 0%, #1e3626 35%, #253d2b 60%, #1a2e1a 100%);
+  --wt-card-bg: rgba(30, 54, 38, 0.88);
+  --wt-card-border: rgba(82, 183, 136, 0.2);
+  --wt-text: #d4e6d4;
+  --wt-text-muted: #8bb396;
+  --wt-heading: #a8d5a0;
+  --wt-accent: #52b788;
+  --wt-accent-light: rgba(82, 183, 136, 0.15);
+  --wt-input-bg: rgba(35, 60, 42, 0.7);
+  --wt-input-border: rgba(82, 183, 136, 0.25);
+  --wt-input-focus-border: #52b788;
+  --wt-input-focus-shadow: rgba(82, 183, 136, 0.2);
+  --wt-btn-bg: linear-gradient(135deg, #52b788 0%, #40916c 100%);
+  --wt-btn-hover: linear-gradient(135deg, #40916c 0%, #2d6a4f 100%);
+  --wt-placeholder: #6d9a78;
+  --wt-selection-bg: rgba(82, 183, 136, 0.25);
+  --wt-tag-bg: rgba(82, 183, 136, 0.18);
+  --wt-tag-color: #52b788;
+  --wt-divider: rgba(82, 183, 136, 0.15);
+}
+
+.writing-theme-sacred-grove .journal-form-themed {
+  background: var(--wt-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dappled sunlight effect */
+.writing-theme-sacred-grove .journal-form-themed::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 5%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(183, 169, 78, 0.12), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: grove-dapple 8s ease-in-out infinite;
+}
+
+.writing-theme-sacred-grove .journal-form-themed::after {
+  content: '';
+  position: absolute;
+  bottom: 15%;
+  left: 8%;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(82, 183, 136, 0.1), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: grove-dapple 11s ease-in-out infinite 2s;
+}
+
+@keyframes grove-dapple {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+
+/* ================================================================
+   THEME 3: MIDNIGHT COSMOS 🌌
+   Meaning: Deep reflection, mystery, infinite possibility
+   Feel: Writing beneath a canopy of stars
+   ================================================================ */
+
+.writing-theme-midnight-cosmos {
+  --wt-bg: linear-gradient(170deg, #0f0c29 0%, #1a1840 35%, #24243e 70%, #121030 100%);
+  --wt-card-bg: rgba(26, 24, 64, 0.85);
+  --wt-card-border: rgba(124, 131, 199, 0.2);
+  --wt-text: #d0d2e8;
+  --wt-text-muted: #8e90b8;
+  --wt-heading: #c4c7f0;
+  --wt-accent: #8b92d0;
+  --wt-accent-light: rgba(139, 146, 208, 0.12);
+  --wt-input-bg: rgba(30, 28, 70, 0.7);
+  --wt-input-border: rgba(124, 131, 199, 0.25);
+  --wt-input-focus-border: #8b92d0;
+  --wt-input-focus-shadow: rgba(139, 146, 208, 0.2);
+  --wt-btn-bg: linear-gradient(135deg, #8b92d0 0%, #6c63ac 100%);
+  --wt-btn-hover: linear-gradient(135deg, #a5abdb 0%, #8b92d0 100%);
+  --wt-placeholder: #6a6c94;
+  --wt-selection-bg: rgba(139, 146, 208, 0.25);
+  --wt-tag-bg: rgba(139, 146, 208, 0.15);
+  --wt-tag-color: #a5abdb;
+  --wt-divider: rgba(124, 131, 199, 0.15);
+}
+
+.writing-theme-midnight-cosmos .journal-form-themed {
+  background: var(--wt-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Twinkling star dots */
+.writing-theme-midnight-cosmos .journal-form-themed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 40% 35%, rgba(200,210,255,0.4), transparent),
+    radial-gradient(1px 1px at 60% 15%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 80% 45%, rgba(200,205,255,0.45), transparent),
+    radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 70% 70%, rgba(210,215,255,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 90% 25%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1px 1px at 10% 80%, rgba(200,210,255,0.3), transparent),
+    radial-gradient(1px 1px at 50% 85%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 35% 90%, rgba(210,220,255,0.35), transparent);
+  pointer-events: none;
+  animation: cosmos-twinkle 5s ease-in-out infinite;
+}
+
+.writing-theme-midnight-cosmos .journal-form-themed::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -10%;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(124, 131, 199, 0.08), transparent 60%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes cosmos-twinkle {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+
+/* ================================================================
+   THEME 4: GOLDEN HOUR 🌅
+   Meaning: Gratitude, warmth, living in the moment
+   Feel: Writing in warm sunset light
+   ================================================================ */
+
+.writing-theme-golden-hour {
+  --wt-bg: linear-gradient(170deg, #fff8ee 0%, #fce4b8 30%, #f9d99a 60%, #fff5e6 100%);
+  --wt-card-bg: rgba(255, 251, 240, 0.92);
+  --wt-card-border: rgba(231, 127, 103, 0.2);
+  --wt-text: #4a3520;
+  --wt-text-muted: #9a7b5e;
+  --wt-heading: #7a4a20;
+  --wt-accent: #e77f67;
+  --wt-accent-light: rgba(231, 127, 103, 0.12);
+  --wt-input-bg: rgba(255, 248, 235, 0.8);
+  --wt-input-border: rgba(231, 165, 103, 0.3);
+  --wt-input-focus-border: #e77f67;
+  --wt-input-focus-shadow: rgba(231, 127, 103, 0.2);
+  --wt-btn-bg: linear-gradient(135deg, #e77f67 0%, #d66b55 100%);
+  --wt-btn-hover: linear-gradient(135deg, #d66b55 0%, #c55a44 100%);
+  --wt-placeholder: #c9a87c;
+  --wt-selection-bg: rgba(231, 127, 103, 0.18);
+  --wt-tag-bg: rgba(231, 165, 103, 0.15);
+  --wt-tag-color: #c55a44;
+  --wt-divider: rgba(231, 165, 103, 0.2);
+}
+
+.writing-theme-golden-hour .journal-form-themed {
+  background: var(--wt-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Warm sun glow */
+.writing-theme-golden-hour .journal-form-themed::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 250px;
+  background: radial-gradient(ellipse, rgba(247, 215, 148, 0.4), rgba(231, 127, 103, 0.1) 50%, transparent 75%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: golden-pulse 6s ease-in-out infinite;
+}
+
+.writing-theme-golden-hour .journal-form-themed::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  right: -20px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(249, 217, 154, 0.25), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes golden-pulse {
+  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.9; transform: translateX(-50%) scale(1.05); }
+}
+
+
+/* ================================================================
+   THEME 5: ROSE QUARTZ 🌸
+   Meaning: Self-love, compassion, emotional healing
+   Feel: Writing wrapped in a gentle embrace
+   ================================================================ */
+
+.writing-theme-rose-quartz {
+  --wt-bg: linear-gradient(170deg, #fdf2f2 0%, #f9e0e0 30%, #f5d5d5 55%, #fef6f6 100%);
+  --wt-card-bg: rgba(255, 249, 249, 0.92);
+  --wt-card-border: rgba(200, 140, 140, 0.22);
+  --wt-text: #4a2c2c;
+  --wt-text-muted: #a07070;
+  --wt-heading: #7a3e3e;
+  --wt-accent: #c88c8c;
+  --wt-accent-light: rgba(200, 140, 140, 0.12);
+  --wt-input-bg: rgba(253, 242, 242, 0.8);
+  --wt-input-border: rgba(200, 160, 160, 0.35);
+  --wt-input-focus-border: #c88c8c;
+  --wt-input-focus-shadow: rgba(200, 140, 140, 0.2);
+  --wt-btn-bg: linear-gradient(135deg, #c88c8c 0%, #b87878 100%);
+  --wt-btn-hover: linear-gradient(135deg, #b87878 0%, #a06868 100%);
+  --wt-placeholder: #cca0a0;
+  --wt-selection-bg: rgba(200, 140, 140, 0.18);
+  --wt-tag-bg: rgba(200, 140, 140, 0.12);
+  --wt-tag-color: #a06868;
+  --wt-divider: rgba(200, 160, 160, 0.2);
+}
+
+.writing-theme-rose-quartz .journal-form-themed {
+  background: var(--wt-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft petal-like floating shapes */
+.writing-theme-rose-quartz .journal-form-themed::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -20px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(244, 194, 194, 0.3), transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: rose-float 10s ease-in-out infinite;
+}
+
+.writing-theme-rose-quartz .journal-form-themed::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: 10%;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(212, 160, 160, 0.2), transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: rose-float 13s ease-in-out infinite reverse;
+}
+
+@keyframes rose-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(3deg); }
+  66% { transform: translateY(5px) rotate(-2deg); }
+}
+
+
+/* ================================================================
+   THEME 6: OCEAN DEEP 🌊
+   Meaning: Courage, depth of emotion, letting go
+   Feel: Writing by moonlit ocean waves
+   ================================================================ */
+
+.writing-theme-ocean-deep {
+  --wt-bg: linear-gradient(170deg, #0a2a3c 0%, #0d3b55 30%, #135872 55%, #0a2a3c 100%);
+  --wt-card-bg: rgba(13, 59, 85, 0.85);
+  --wt-card-border: rgba(56, 173, 169, 0.22);
+  --wt-text: #c8e6e5;
+  --wt-text-muted: #7cb5b3;
+  --wt-heading: #8ed4d2;
+  --wt-accent: #38ada9;
+  --wt-accent-light: rgba(56, 173, 169, 0.12);
+  --wt-input-bg: rgba(15, 50, 72, 0.7);
+  --wt-input-border: rgba(56, 173, 169, 0.25);
+  --wt-input-focus-border: #38ada9;
+  --wt-input-focus-shadow: rgba(56, 173, 169, 0.2);
+  --wt-btn-bg: linear-gradient(135deg, #38ada9 0%, #2d8f8c 100%);
+  --wt-btn-hover: linear-gradient(135deg, #2d8f8c 0%, #247370 100%);
+  --wt-placeholder: #5a9190;
+  --wt-selection-bg: rgba(56, 173, 169, 0.22);
+  --wt-tag-bg: rgba(56, 173, 169, 0.15);
+  --wt-tag-color: #38ada9;
+  --wt-divider: rgba(56, 173, 169, 0.15);
+}
+
+.writing-theme-ocean-deep .journal-form-themed {
+  background: var(--wt-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle wave shimmer */
+.writing-theme-ocean-deep .journal-form-themed::before {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: -10%;
+  right: -10%;
+  height: 60%;
+  background: 
+    radial-gradient(ellipse at 30% 80%, rgba(56, 173, 169, 0.08), transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(30, 111, 142, 0.1), transparent 50%);
+  pointer-events: none;
+  animation: ocean-wave 8s ease-in-out infinite;
+}
+
+.writing-theme-ocean-deep .journal-form-themed::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(56, 173, 169, 0.06), transparent 60%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes ocean-wave {
+  0%, 100% { transform: translateY(0) scaleX(1); }
+  50% { transform: translateY(-12px) scaleX(1.02); }
+}
+
+
+/* ================================================================
+   SHARED THEMED FORM STYLES
+   Applied to any active writing theme
+   ================================================================ */
+
+[class*="writing-theme-"] .journal-form-themed {
+  border-radius: 20px;
+  padding: 0;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+}
+
+[class*="writing-theme-"] .journal-form-themed .card {
+  background: var(--wt-card-bg, inherit) !important;
+  border-color: var(--wt-card-border, inherit) !important;
+  border-radius: 20px !important;
+  box-shadow: none !important;
+  color: var(--wt-text);
+}
+
+[class*="writing-theme-"] .journal-form-themed .card-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--wt-divider) !important;
+  color: var(--wt-heading) !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .card-header h4,
+[class*="writing-theme-"] .journal-form-themed .card-header h5 {
+  color: var(--wt-heading) !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* Form Labels */
+[class*="writing-theme-"] .journal-form-themed .form-label {
+  color: var(--wt-heading) !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+}
+
+/* Form Inputs & Textareas */
+[class*="writing-theme-"] .journal-form-themed .form-control {
+  background: var(--wt-input-bg) !important;
+  border: 1.5px solid var(--wt-input-border) !important;
+  color: var(--wt-text) !important;
+  border-radius: 12px !important;
+  padding: 0.7rem 1rem !important;
+  transition: all 0.3s ease !important;
+  font-size: 1rem;
+}
+
+[class*="writing-theme-"] .journal-form-themed .form-control::placeholder {
+  color: var(--wt-placeholder) !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .form-control:focus {
+  border-color: var(--wt-input-focus-border) !important;
+  box-shadow: 0 0 0 3px var(--wt-input-focus-shadow) !important;
+  background: var(--wt-input-bg) !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .form-control::selection {
+  background: var(--wt-selection-bg);
+}
+
+/* Textarea specific - journal writing area */
+[class*="writing-theme-"] .journal-form-themed textarea.form-control {
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  font-family: var(--font-family-sans, 'Manrope', sans-serif);
+  min-height: 320px !important;
+}
+
+/* Buttons */
+[class*="writing-theme-"] .journal-form-themed .btn-primary {
+  background: var(--wt-btn-bg) !important;
+  border: none !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  padding: 0.6rem 1.5rem !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12) !important;
+  transition: all 0.3s ease !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .btn-primary:hover {
+  background: var(--wt-btn-hover) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18) !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .btn-secondary {
+  background: transparent !important;
+  border: 1.5px solid var(--wt-card-border) !important;
+  color: var(--wt-text-muted) !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .btn-secondary:hover {
+  background: var(--wt-accent-light) !important;
+  border-color: var(--wt-accent) !important;
+  color: var(--wt-accent) !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .btn-outline-primary {
+  border-color: var(--wt-accent) !important;
+  color: var(--wt-accent) !important;
+  background: transparent !important;
+  border-radius: 10px !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .btn-outline-primary:hover {
+  background: var(--wt-accent) !important;
+  color: #fff !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .btn-outline-secondary {
+  border-color: var(--wt-input-border) !important;
+  color: var(--wt-text-muted) !important;
+  background: transparent !important;
+  border-radius: 10px !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .btn-outline-secondary:hover {
+  background: var(--wt-accent-light) !important;
+  color: var(--wt-accent) !important;
+}
+
+/* Tags / Badges */
+[class*="writing-theme-"] .journal-form-themed .badge {
+  background: var(--wt-tag-bg) !important;
+  color: var(--wt-tag-color) !important;
+  border: 1px solid var(--wt-card-border) !important;
+  font-weight: 600;
+  border-radius: 8px !important;
+}
+
+/* Alerts */
+[class*="writing-theme-"] .journal-form-themed .alert-danger {
+  background: rgba(220, 50, 50, 0.1) !important;
+  border: 1px solid rgba(220, 50, 50, 0.2) !important;
+  color: #e74c4c !important;
+  border-radius: 12px !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .alert-success {
+  background: rgba(40, 180, 100, 0.1) !important;
+  border: 1px solid rgba(40, 180, 100, 0.2) !important;
+  color: #28b464 !important;
+  border-radius: 12px !important;
+}
+
+/* Text colors */
+[class*="writing-theme-"] .journal-form-themed .text-muted {
+  color: var(--wt-text-muted) !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed p,
+[class*="writing-theme-"] .journal-form-themed span,
+[class*="writing-theme-"] .journal-form-themed small {
+  color: var(--wt-text);
+}
+
+/* AI cards within themed form */
+[class*="writing-theme-"] .journal-form-themed .ai-mood-card,
+[class*="writing-theme-"] .journal-form-themed .ai-suggestion-card {
+  background: var(--wt-card-bg) !important;
+  border-color: var(--wt-card-border) !important;
+  border-radius: 14px !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .ai-mood-header,
+[class*="writing-theme-"] .journal-form-themed .ai-suggestion-header {
+  background: var(--wt-accent-light) !important;
+  border-bottom: 1px solid var(--wt-divider) !important;
+  color: var(--wt-heading) !important;
+  border-radius: 14px 14px 0 0 !important;
+}
+
+/* Checkbox / Form Check */
+[class*="writing-theme-"] .journal-form-themed .form-check-label {
+  color: var(--wt-text) !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .form-check-input:checked {
+  background-color: var(--wt-accent) !important;
+  border-color: var(--wt-accent) !important;
+}
+
+/* Input Group */
+[class*="writing-theme-"] .journal-form-themed .input-group .form-control {
+  border-radius: 12px 0 0 12px !important;
+}
+
+[class*="writing-theme-"] .journal-form-themed .input-group .btn {
+  border-radius: 0 12px 12px 0 !important;
+}
+
+/* Spinner */
+[class*="writing-theme-"] .journal-form-themed .spinner-border {
+  color: var(--wt-accent) !important;
+}
+
+
+/* ================================================================
+   DARK MODE THEME PICKER OVERRIDES
+   ================================================================ */
+
+[data-bs-theme="dark"] .writing-theme-picker {
+  background: rgba(37, 40, 54, 0.75);
+  border-color: rgba(139, 146, 208, 0.15);
+}
+
+[data-bs-theme="dark"] .writing-theme-picker-label {
+  color: var(--text-muted-dark, #9ca3af);
+}
+
+[data-bs-theme="dark"] .theme-swatch {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-bs-theme="dark"] .theme-swatch.active {
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), 0 0 0 2.5px var(--swatch-ring, #888);
+}
+
+[data-bs-theme="dark"] .theme-swatch-name {
+  color: var(--text-muted-dark, #9ca3af);
+}
+
+/* ================================================================
+   THEME TRANSITION ANIMATION
+   ================================================================ */
+
+.theme-transition-enter {
+  animation: themeReveal 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes themeReveal {
+  0% {
+    opacity: 0.6;
+    filter: blur(4px);
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+}
+
+/* ================================================================
+   RESPONSIVE ADJUSTMENTS
+   ================================================================ */
+
+@media (max-width: 768px) {
+  .writing-theme-picker {
+    padding: 0.6rem 0.75rem;
+    gap: 0.35rem;
+    border-radius: 12px;
+  }
+
+  .theme-swatch {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    font-size: 1rem;
+  }
+
+  .writing-theme-picker-label {
+    font-size: 0.7rem;
+  }
+
+  .theme-swatch-name {
+    font-size: 0.55rem;
+  }
+
+  [class*="writing-theme-"] .journal-form-themed .card {
+    border-radius: 14px !important;
+  }
+}
+
+/* ================================================================
+   REDUCED MOTION PREFERENCE
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .writing-theme-serenity .journal-form-themed::before,
+  .writing-theme-serenity .journal-form-themed::after,
+  .writing-theme-sacred-grove .journal-form-themed::before,
+  .writing-theme-sacred-grove .journal-form-themed::after,
+  .writing-theme-midnight-cosmos .journal-form-themed::before,
+  .writing-theme-golden-hour .journal-form-themed::before,
+  .writing-theme-rose-quartz .journal-form-themed::before,
+  .writing-theme-rose-quartz .journal-form-themed::after,
+  .writing-theme-ocean-deep .journal-form-themed::before {
+    animation: none !important;
+  }
+
+  .theme-swatch {
+    transition-duration: 0.01ms !important;
+  }
+
+  .theme-transition-enter {
+    animation-duration: 0.01ms !important;
+  }
+}
