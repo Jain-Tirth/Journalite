@@ -10,11 +10,11 @@ import {
   Badge,
   Image,
   Modal,
-  Spinner,
 } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import { encryptedJournalService } from '../../services/encryptedJournalService';
 import { formatReadableDate } from '../../utils/taskUtils';
+import JournaliteLoader from '../ui/JournaliteLoader';
 
 const JournalDetail = () => {
   const { id } = useParams();
@@ -84,8 +84,7 @@ const JournalDetail = () => {
   if (loading) {
     return (
       <Container fluid className="mt-4 text-center px-4">
-        <Spinner animation="border" />
-        <p className="mt-2">Loading journal entry...</p>
+        <JournaliteLoader message="Loading journal entry..." />
       </Container>
     );
   }

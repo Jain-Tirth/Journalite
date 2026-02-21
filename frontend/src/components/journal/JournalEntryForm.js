@@ -16,6 +16,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { encryptedJournalService } from '../../services/encryptedJournalService';
 import { analyticsService } from '../../services/analyticsService';
+import JournaliteLoader from '../ui/JournaliteLoader';
+import WritingThemePicker from './WritingThemePicker';
 
 const JournalEntryForm = () => {
   const { currentUser } = useAuth();
@@ -43,6 +45,16 @@ const JournalEntryForm = () => {
   const [detectedMood, setDetectedMood] = useState(null);
   const [moodDetectionLoading, setMoodDetectionLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false); // Fixed typo and naming
+  const [writingTheme, setWritingTheme] = useState(null);
+  const [themeTransitioning, setThemeTransitioning] = useState(false);
+
+  const handleWritingThemeChange = (themeClassName) => {
+    setWritingTheme(themeClassName);
+    if (themeClassName) {
+      setThemeTransitioning(true);
+      setTimeout(() => setThemeTransitioning(false), 600);
+    }
+  };
 
   // Load existing entry data when in edit mode
   useEffect(() => {
@@ -231,7 +243,7 @@ const JournalEntryForm = () => {
     setError('');
 
     try {
-      if (isEdit) {     
+      if (isEdit) {
         // Upload new images if any
         const newImageUrls = [];
         for (const image of images) {
@@ -312,8 +324,7 @@ const JournalEntryForm = () => {
   if (initialLoading) {
     return (
       <Container fluid className="mt-4 text-center px-4">
-        <Spinner animation="border" />
-        <p className="mt-2">Loading journal entry...</p>
+        <JournaliteLoader message="Loading journal entry..." />
       </Container>
     );
   }
@@ -322,267 +333,275 @@ const JournalEntryForm = () => {
     <Container fluid className="mt-4 px-4">
       <Row className="justify-content-center">
         <Col xl={10} lg={11}>
-          <Card className="shadow-sm">
-            <Card.Header className="journal-form-header">
-              <h4 className="mb-0">
-                <i className={`bi ${isEdit ? 'bi-pencil-square' : 'bi-journal-plus'} me-2`}></i>
-                {isEdit ? 'Edit Journal Entry' : 'New Journal Entry'}
-              </h4>
-            </Card.Header>
+          {/* Writing Theme Picker */}
+          <WritingThemePicker onThemeChange={handleWritingThemeChange} />
 
-            <Card.Body>
-              {error && <Alert variant="danger">{error}</Alert>}
-              {success && <Alert variant="success">{success}</Alert>}
+          {/* Themed Form Wrapper */}
+          <div className={writingTheme || ''}>
+            <div className={`journal-form-themed ${themeTransitioning ? 'theme-transition-enter' : ''}`}>
+              <Card className="shadow-sm">
+                <Card.Header className="journal-form-header">
+                  <h4 className="mb-0">
+                    <i className={`bi ${isEdit ? 'bi-pencil-square' : 'bi-journal-plus'} me-2`}></i>
+                    {isEdit ? 'Edit Journal Entry' : 'New Journal Entry'}
+                  </h4>
+                </Card.Header>
 
-              <Form onSubmit={handleSubmit}>
-                {/* Title */}
-                <Form.Group className="mb-3">
-                  <Form.Label>Title *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    placeholder="What's on your mind today?"
-                    required
-                  />
-                </Form.Group>
+                <Card.Body>
+                  {error && <Alert variant="danger">{error}</Alert>}
+                  {success && <Alert variant="success">{success}</Alert>}
 
-                {/* Content */}
-                <Form.Group className="mb-3">
-                  <Form.Label>Content *</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={8}
-                    name="content"
-                    value={formData.content}
-                    onChange={handleInputChange}
-                    placeholder="Write about your day, thoughts, feelings, or anything that comes to mind..."
-                    required
-                  />
-                </Form.Group>
+                  <Form onSubmit={handleSubmit}>
+                    {/* Title */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>Title *</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        placeholder="What's on your mind today?"
+                        required
+                      />
+                    </Form.Group>
 
-                {/* AI Mood Detection */}
-                <Card className="mb-3 ai-mood-card">
-                  <Card.Header className="ai-mood-header d-flex justify-content-between align-items-center">
-                    <span>
-                      <i className="bi bi-emoji-smile me-2"></i>
-                      AI Mood Detection
-                    </span>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={detectMoodFromContent}
-                      disabled={moodDetectionLoading || (!formData.title && !formData.content)}
-                    >
-                      {moodDetectionLoading ? <Spinner animation="border" size="sm" /> : 'Detect Mood'}
-                    </Button>
-                  </Card.Header>
-                  {detectedMood && (
-                    <Card.Body>
-                      <div className="d-flex align-items-center">
-                        <span className="fs-4 me-2">{getEmotionEmoji(detectedMood.primary)}</span>
-                        <div>
-                          <strong className="text-capitalize">{detectedMood.primary}</strong>
-                          <div className="small text-muted">
-                            Confidence: {Math.round(detectedMood.confidence * 100)}%
-                            {detectedMood.sentimentScore && (
-                              <span className="ms-2">
-                                Sentiment: {detectedMood.sentimentScore > 0 ? '😊 Positive' :
-                                  detectedMood.sentimentScore < 0 ? '😔 Negative' : '😐 Neutral'}
-                              </span>
-                            )}
-                          </div>
-                          {detectedMood.keywords && detectedMood.keywords.length > 0 && (
-                            <div className="mt-1">
-                              <small className="text-muted">Key emotions: </small>
-                              {detectedMood.keywords.slice(0, 3).map((keyword, index) => (
-                                <Badge key={index} bg="secondary" className="me-1">
-                                  {keyword}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </Card.Body>
-                  )}
-                </Card>
+                    {/* Content */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>Content *</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={8}
+                        name="content"
+                        value={formData.content}
+                        onChange={handleInputChange}
+                        placeholder="Write about your day, thoughts, feelings, or anything that comes to mind..."
+                        required
+                      />
+                    </Form.Group>
 
-                {/* AI Suggestion */}
-                <Card className="mb-3 ai-suggestion-card">
-                  <Card.Header className="ai-suggestion-header d-flex justify-content-between align-items-center">
-                    <span>
-                      <i className="bi bi-robot me-2"></i>
-                      AI Writing Assistant
-                    </span>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={getAISuggestion}
-                      disabled={loadingAI}
-                    >
-                      {loadingAI ? <Spinner animation="border" size="sm" /> : 'Get Suggestion'}
-                    </Button>
-                  </Card.Header>
-                  {aiSuggestion && (
-                    <Card.Body>
-                      <p className="mb-0 fst-italic">{aiSuggestion}</p>
-                    </Card.Body>
-                  )}
-                </Card>
-
-                {/* Images */}
-                <Form.Group className="mb-3">
-                  <Form.Label>{isEdit ? 'Manage Photos' : 'Add Photos'}</Form.Label>
-
-                  {/* Existing Images (Edit Mode) */}
-                  {isEdit && existingImages.length > 0 && (
-                    <div className="mb-3">
-                      <h6 className="text-muted">Current Photos</h6>
-                      <Row>
-                        {existingImages.map((imageUrl, index) => (
-                          <Col xs={6} md={4} lg={3} key={`existing-${index}`} className="mb-2">
-                            <div className="position-relative">
-                              <Image
-                                src={imageUrl}
-                                thumbnail
-                                className="w-100"
-                                style={{ height: '100px', objectFit: 'cover' }}
-                              />
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                className="position-absolute top-0 end-0"
-                                onClick={() => removeExistingImage(index)}
-                                title="Remove existing photo"
-                              >
-                                ×
-                              </Button>
-                            </div>
-                          </Col>
-                        ))}
-                      </Row>
-                    </div>
-                  )}
-
-                  {/* New Images Upload */}
-                  <Form.Control
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    ref={fileInputRef}
-                  />
-                  <Form.Text className="text-muted">
-                    {isEdit ? 'Add new photos (max 5MB each)' : 'You can upload multiple images (max 5MB each)'}
-                  </Form.Text>
-
-                  {/* New Images Preview */}
-                  {images.length > 0 && (
-                    <div className="mt-3">
-                      <h6 className="text-muted">New Photos to Add</h6>
-                      <Row>
-                        {images.map((image, index) => (
-                          <Col xs={6} md={4} lg={3} key={`new-${index}`} className="mb-2">
-                            <div className="position-relative">
-                              <Image
-                                src={URL.createObjectURL(image)}
-                                thumbnail
-                                className="w-100"
-                                style={{ height: '100px', objectFit: 'cover' }}
-                              />
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                className="position-absolute top-0 end-0"
-                                onClick={() => removeImage(index)}
-                                title="Remove new photo"
-                              >
-                                ×
-                              </Button>
-                            </div>
-                          </Col>
-                        ))}
-                      </Row>
-                    </div>
-                  )}
-                </Form.Group>
-
-                {/* Tags */}
-                <Form.Group className="mb-3">
-                  <Form.Label>Tags</Form.Label>
-                  <InputGroup>
-                    <Form.Control
-                      type="text"
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      placeholder="Add a tag..."
-                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                    />
-                    <Button variant="outline-secondary" onClick={addTag}>
-                      Add
-                    </Button>
-                  </InputGroup>
-
-                  {formData.tags.length > 0 && (
-                    <div className="mt-2">
-                      {formData.tags.map(tag => (
-                        <Badge
-                          key={tag}
-                          bg="primary"
-                          className="me-1 mb-1"
-                          style={{ cursor: 'pointer' }}
-                          onClick={() => removeTag(tag)}
+                    {/* AI Mood Detection */}
+                    <Card className="mb-3 ai-mood-card">
+                      <Card.Header className="ai-mood-header d-flex justify-content-between align-items-center">
+                        <span>
+                          <i className="bi bi-emoji-smile me-2"></i>
+                          AI Mood Detection
+                        </span>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={detectMoodFromContent}
+                          disabled={moodDetectionLoading || (!formData.title && !formData.content)}
                         >
-                          {tag} ×
-                        </Badge>
-                      ))}
+                          {moodDetectionLoading ? <Spinner animation="border" size="sm" /> : 'Detect Mood'}
+                        </Button>
+                      </Card.Header>
+                      {detectedMood && (
+                        <Card.Body>
+                          <div className="d-flex align-items-center">
+                            <span className="fs-4 me-2">{getEmotionEmoji(detectedMood.primary)}</span>
+                            <div>
+                              <strong className="text-capitalize">{detectedMood.primary}</strong>
+                              <div className="small text-muted">
+                                Confidence: {Math.round(detectedMood.confidence * 100)}%
+                                {detectedMood.sentimentScore && (
+                                  <span className="ms-2">
+                                    Sentiment: {detectedMood.sentimentScore > 0 ? '😊 Positive' :
+                                      detectedMood.sentimentScore < 0 ? '😔 Negative' : '😐 Neutral'}
+                                  </span>
+                                )}
+                              </div>
+                              {detectedMood.keywords && detectedMood.keywords.length > 0 && (
+                                <div className="mt-1">
+                                  <small className="text-muted">Key emotions: </small>
+                                  {detectedMood.keywords.slice(0, 3).map((keyword, index) => (
+                                    <Badge key={index} bg="secondary" className="me-1">
+                                      {keyword}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </Card.Body>
+                      )}
+                    </Card>
+
+                    {/* AI Suggestion */}
+                    <Card className="mb-3 ai-suggestion-card">
+                      <Card.Header className="ai-suggestion-header d-flex justify-content-between align-items-center">
+                        <span>
+                          <i className="bi bi-robot me-2"></i>
+                          AI Writing Assistant
+                        </span>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={getAISuggestion}
+                          disabled={loadingAI}
+                        >
+                          {loadingAI ? <Spinner animation="border" size="sm" /> : 'Get Suggestion'}
+                        </Button>
+                      </Card.Header>
+                      {aiSuggestion && (
+                        <Card.Body>
+                          <p className="mb-0 fst-italic">{aiSuggestion}</p>
+                        </Card.Body>
+                      )}
+                    </Card>
+
+                    {/* Images */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>{isEdit ? 'Manage Photos' : 'Add Photos'}</Form.Label>
+
+                      {/* Existing Images (Edit Mode) */}
+                      {isEdit && existingImages.length > 0 && (
+                        <div className="mb-3">
+                          <h6 className="text-muted">Current Photos</h6>
+                          <Row>
+                            {existingImages.map((imageUrl, index) => (
+                              <Col xs={6} md={4} lg={3} key={`existing-${index}`} className="mb-2">
+                                <div className="position-relative">
+                                  <Image
+                                    src={imageUrl}
+                                    thumbnail
+                                    className="w-100"
+                                    style={{ height: '100px', objectFit: 'cover' }}
+                                  />
+                                  <Button
+                                    variant="danger"
+                                    size="sm"
+                                    className="position-absolute top-0 end-0"
+                                    onClick={() => removeExistingImage(index)}
+                                    title="Remove existing photo"
+                                  >
+                                    ×
+                                  </Button>
+                                </div>
+                              </Col>
+                            ))}
+                          </Row>
+                        </div>
+                      )}
+
+                      {/* New Images Upload */}
+                      <Form.Control
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        ref={fileInputRef}
+                      />
+                      <Form.Text className="text-muted">
+                        {isEdit ? 'Add new photos (max 5MB each)' : 'You can upload multiple images (max 5MB each)'}
+                      </Form.Text>
+
+                      {/* New Images Preview */}
+                      {images.length > 0 && (
+                        <div className="mt-3">
+                          <h6 className="text-muted">New Photos to Add</h6>
+                          <Row>
+                            {images.map((image, index) => (
+                              <Col xs={6} md={4} lg={3} key={`new-${index}`} className="mb-2">
+                                <div className="position-relative">
+                                  <Image
+                                    src={URL.createObjectURL(image)}
+                                    thumbnail
+                                    className="w-100"
+                                    style={{ height: '100px', objectFit: 'cover' }}
+                                  />
+                                  <Button
+                                    variant="danger"
+                                    size="sm"
+                                    className="position-absolute top-0 end-0"
+                                    onClick={() => removeImage(index)}
+                                    title="Remove new photo"
+                                  >
+                                    ×
+                                  </Button>
+                                </div>
+                              </Col>
+                            ))}
+                          </Row>
+                        </div>
+                      )}
+                    </Form.Group>
+
+                    {/* Tags */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>Tags</Form.Label>
+                      <InputGroup>
+                        <Form.Control
+                          type="text"
+                          value={newTag}
+                          onChange={(e) => setNewTag(e.target.value)}
+                          placeholder="Add a tag..."
+                          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                        />
+                        <Button variant="outline-secondary" onClick={addTag}>
+                          Add
+                        </Button>
+                      </InputGroup>
+
+                      {formData.tags.length > 0 && (
+                        <div className="mt-2">
+                          {formData.tags.map(tag => (
+                            <Badge
+                              key={tag}
+                              bg="primary"
+                              className="me-1 mb-1"
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => removeTag(tag)}
+                            >
+                              {tag} ×
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </Form.Group>
+
+                    {/* Privacy */}
+                    <Form.Group className="mb-4">
+                      <Form.Check
+                        type="checkbox"
+                        name="isPrivate"
+                        checked={formData.isPrivate}
+                        onChange={handleInputChange}
+                        label="Keep this entry private"
+                      />
+                    </Form.Group>
+
+                    {/* Submit Buttons */}
+                    <div className="d-flex justify-content-between">
+                      <Button
+                        variant="secondary"
+                        onClick={() => navigate(isEdit ? `/journal/${id}` : '/journal')}
+                        disabled={loading}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <>
+                            <Spinner animation="border" size="sm" className="me-2" />
+                            {isEdit ? 'Updating...' : 'Saving...'}
+                          </>
+                        ) : (
+                          <>
+                            <i className={`bi ${isEdit ? 'bi-check-circle' : 'bi-save'} me-2`}></i>
+                            {isEdit ? 'Update Entry' : 'Save Entry'}
+                          </>
+                        )}
+                      </Button>
                     </div>
-                  )}
-                </Form.Group>
-
-                {/* Privacy */}
-                <Form.Group className="mb-4">
-                  <Form.Check
-                    type="checkbox"
-                    name="isPrivate"
-                    checked={formData.isPrivate}
-                    onChange={handleInputChange}
-                    label="Keep this entry private"
-                  />
-                </Form.Group>
-
-                {/* Submit Buttons */}
-                <div className="d-flex justify-content-between">
-                  <Button
-                    variant="secondary"
-                    onClick={() => navigate(isEdit ? `/journal/${id}` : '/journal')}
-                    disabled={loading}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <Spinner animation="border" size="sm" className="me-2" />
-                        {isEdit ? 'Updating...' : 'Saving...'}
-                      </>
-                    ) : (
-                      <>
-                        <i className={`bi ${isEdit ? 'bi-check-circle' : 'bi-save'} me-2`}></i>
-                        {isEdit ? 'Update Entry' : 'Save Entry'}
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </Form>
-            </Card.Body>
-          </Card>
+                  </Form>
+                </Card.Body>
+              </Card>
+            </div>
+          </div>
         </Col>
       </Row>
     </Container>

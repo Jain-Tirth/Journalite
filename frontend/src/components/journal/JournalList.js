@@ -10,12 +10,12 @@ import {
   Badge,
   Form,
   InputGroup,
-  Spinner,
   Image,
   Modal
 } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import { encryptedJournalService } from '../../services/encryptedJournalService'
+import JournaliteLoader from '../ui/JournaliteLoader';
 
 import { formatReadableDate } from '../../utils/taskUtils';
 
@@ -138,8 +138,7 @@ const JournalList = () => {
   if (loading) {
     return (
       <Container fluid className="mt-4 text-center px-4">
-        <Spinner animation="border" />
-        <p className="mt-2">Loading your journal entries...</p>
+        <JournaliteLoader message="Loading your journal entries..." />
       </Container>
     );
   }
@@ -149,19 +148,19 @@ const JournalList = () => {
       {/* Header */}
       <Row className="mb-4">
         <Col>
-          <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-between align-items-center journal-list-header">
             <div>
-              <h2>
+              <h2 className="journal-list-title">
                 <i className="bi bi-journal-text me-2"></i>
                 My Journal
               </h2>
               {stats && (
-                <p className="text-muted">
+                <p className="text-muted journal-list-stats">
                   {stats.totalEntries} entries • {stats.entriesThisMonth} this month
                 </p>
               )}
             </div>
-            <div>
+            <div className="journal-list-actions">
               <Button as={Link} to="/journal/new" variant="primary" className="me-2">
                 <i className="bi bi-plus-circle me-2"></i>
                 New Entry
@@ -170,44 +169,6 @@ const JournalList = () => {
           </div>
         </Col>
       </Row>
-
-      {/* Stats Cards */}
-      {stats && (
-        <Row className="mb-4 justify-content-center">
-          <Col xl={2} lg={3} md={4} sm={6} className="mb-3">
-            <Card className="text-center border-primary">
-              <Card.Body>
-                <h4 className="text-primary">{stats.totalEntries}</h4>
-                <small className="text-muted">Total Entries</small>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col xl={2} lg={3} md={4} sm={6} className="mb-3">
-            <Card className="text-center border-success">
-              <Card.Body>
-                <h4 className="text-success">{stats.entriesThisMonth}</h4>
-                <small className="text-muted">This Month</small>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col xl={2} lg={3} md={4} sm={6} className="mb-3">
-            <Card className="text-center border-info">
-              <Card.Body>
-                <h4 className="text-info">{Object.keys(stats.moodCounts).length}</h4>
-                <small className="text-muted">Different Moods</small>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col xl={2} lg={3} md={4} sm={6} className="mb-3">
-            <Card className="text-center border-warning">
-              <Card.Body>
-                <h4 className="text-warning">{Object.keys(stats.tagsCount).length}</h4>
-                <small className="text-muted">Unique Tags</small>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      )}
 
       {/* Search */}
       <Row className="mb-4 justify-content-center">

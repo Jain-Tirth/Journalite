@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button, Offcanvas, Navbar as BootstrapNavbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const { currentUser, logout, isAdmin } = useAuth();
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [showSidebar, setShowSidebar] = useState(false);
-  const isDarkMode = theme === 'dark';
 
   const handleLogout = () => {
     logout();
@@ -35,28 +31,24 @@ const Navbar = () => {
   const MobileMenuButton = () => (
     <Button
       variant="link"
-      className="position-fixed d-lg-none"
+      className="position-fixed d-lg-none mobile-menu-btn"
       style={{
-        top: '15px',
-        right: '15px',
         zIndex: 1040,
         border: 'none',
-        background: 'transparent',
         padding: '8px',
-        borderRadius: '8px',
-        boxShadow: isDarkMode ? '0 2px 10px rgba(255,255,255,0.1)' : '0 2px 10px rgba(0,0,0,0.1)'
+        borderRadius: '10px'
       }}
       onClick={handleShowSidebar}
     >
-      <i className={`bi bi-list fs-4 ${isDarkMode ? 'text-white' : 'text-dark'}`}></i>
+      <i className="bi bi-list fs-4 text-primary"></i>
     </Button>
   );
 
   // Desktop/Tablet Horizontal Navbar
   const DesktopNavbar = () => (
     <BootstrapNavbar
-      bg={isDarkMode ? "dark" : "light"}
-      variant={isDarkMode ? "dark" : "light"}
+      bg="light"
+      variant="light"
       expand="lg"
       fixed="top"
       className="shadow-sm d-none d-lg-block"
@@ -99,10 +91,6 @@ const Navbar = () => {
           </Nav>
 
           <Nav className="d-flex align-items-center">
-            <div className="me-3">
-              <ThemeToggle />
-            </div>
-
             {currentUser && (
               <NavDropdown
                 title={
@@ -154,7 +142,7 @@ const Navbar = () => {
             onClick={onItemClick}
             style={{ fontSize: '1.5rem' }}
           >
-            <i className={`bi bi-x ${isDarkMode ? 'text-white' : 'text-dark'}`}></i>
+            <i className="bi bi-x text-dark"></i>
           </Button>
         </div>
       </div>
@@ -224,7 +212,6 @@ const Navbar = () => {
       {/* Footer */}
       <div className="p-4 border-top">
         <div className="d-flex align-items-center justify-content-between">
-          <ThemeToggle />
           {currentUser && (
             <div className="d-flex align-items-center">
               <div className="me-3">
@@ -268,9 +255,7 @@ const Navbar = () => {
     <Link
       to={to}
       className={`d-block text-decoration-none py-3 px-3 rounded-3 mb-2 transition-all ${
-        isActive
-          ? (isDarkMode ? 'bg-primary text-white' : 'bg-primary text-white')
-          : (isDarkMode ? 'text-white hover-bg-dark' : 'text-dark hover-bg-light')
+        isActive ? 'journal-nav-active' : 'journal-nav-item'
       }`}
       onClick={onClick}
       style={{
@@ -299,7 +284,7 @@ const Navbar = () => {
         show={showSidebar}
         onHide={handleCloseSidebar}
         placement="start"
-        className={`${isDarkMode ? 'bg-dark text-white' : 'bg-white text-dark'} sidebar-offcanvas d-lg-none`}
+        className="sidebar-offcanvas d-lg-none"
         style={{ width: '300px' }}
       >
         <SidebarContent onItemClick={handleCloseSidebar} />
