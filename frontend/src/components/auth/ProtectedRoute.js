@@ -15,7 +15,7 @@ const ProtectedRoute = ({ adminOnly = false }) => {
   }
 
   if (!currentUser) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (adminOnly && !isAdmin()) {

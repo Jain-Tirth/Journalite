@@ -23,7 +23,7 @@ const Login = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       await login(values.email, values.password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
     } finally {
@@ -45,7 +45,7 @@ const Login = () => {
             </Card.Header>
             <Card.Body>
               {error && <Alert variant="danger">{error}</Alert>}
-              
+
               <Formik
                 initialValues={{ email: '', password: '' }}
                 validationSchema={LoginSchema}
@@ -90,9 +90,9 @@ const Login = () => {
                     </div>
 
                     <div className="d-grid gap-2">
-                      <Button 
-                        variant="primary" 
-                        type="submit" 
+                      <Button
+                        variant="primary"
+                        type="submit"
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? 'Logging in...' : 'Login'}

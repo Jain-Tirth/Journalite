@@ -28,6 +28,9 @@ import Insights from './components/insights/Insights';
 // Dashboard Components
 import Dashboard from './components/Dashboard';
 
+// Landing Page
+import LandingPage from './components/LandingPage';
+
 function App() {
   return (
     <AuthProvider>
@@ -37,32 +40,33 @@ function App() {
           <main>
             <Routes>
               {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
 
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
 
-              {/* Journal Routes */}
-              <Route path="/journal" element={<JournalList />} />
-              <Route path="/journal/new" element={<JournalEntryForm />} />
-              <Route path="/journal/:id" element={<JournalDetail />} />
-              <Route path="/journal/:id/edit" element={<JournalEntryForm />} />
+                {/* Journal Routes */}
+                <Route path="/journal" element={<JournalList />} />
+                <Route path="/journal/new" element={<JournalEntryForm />} />
+                <Route path="/journal/:id" element={<JournalDetail />} />
+                <Route path="/journal/:id/edit" element={<JournalEntryForm />} />
 
-              {/* Insights Route */}
-              <Route path="/insights" element={<Insights />} />
-            </Route>
+                {/* Insights Route */}
+                <Route path="/insights" element={<Insights />} />
+              </Route>
 
-            {/* Catch-all Route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+              {/* Catch-all Route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
     </AuthProvider>
   );
 }

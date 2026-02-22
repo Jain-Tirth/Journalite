@@ -9,6 +9,9 @@ const Navbar = () => {
   const location = useLocation();
   const [showSidebar, setShowSidebar] = useState(false);
 
+  // Hide navbar on landing page
+  if (location.pathname === '/') return null;
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -63,7 +66,7 @@ const Navbar = () => {
           <Nav className="me-auto">
             {currentUser ? (
               <>
-                <Nav.Link as={Link} to="/" className={isActive('/') ? 'active' : ''}>
+                <Nav.Link as={Link} to="/dashboard" className={isActive('/dashboard') ? 'active' : ''}>
                   <i className="bi bi-house me-1"></i> Home
                 </Nav.Link>
                 <Nav.Link as={Link} to="/journal" className={isActive('/journal') ? 'active' : ''}>
@@ -152,10 +155,10 @@ const Navbar = () => {
         {currentUser ? (
           <div className="px-3">
             <NavItem
-              to="/"
+              to="/dashboard"
               icon="bi-house"
               label="Dashboard"
-              isActive={isActive('/')}
+              isActive={isActive('/dashboard')}
               onClick={onItemClick}
             />
             <NavItem
@@ -254,9 +257,8 @@ const Navbar = () => {
   const NavItem = ({ to, icon, label, isActive, onClick }) => (
     <Link
       to={to}
-      className={`d-block text-decoration-none py-3 px-3 rounded-3 mb-2 transition-all ${
-        isActive ? 'journal-nav-active' : 'journal-nav-item'
-      }`}
+      className={`d-block text-decoration-none py-3 px-3 rounded-3 mb-2 transition-all ${isActive ? 'journal-nav-active' : 'journal-nav-item'
+        }`}
       onClick={onClick}
       style={{
         transition: 'all 0.2s ease',
