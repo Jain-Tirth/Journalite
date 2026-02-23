@@ -2,9 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import './LandingPage.css';
 
 const LandingPage = () => {
+    useDocumentTitle(null); // Uses default title from index.html
     const { currentUser } = useAuth();
     const heroRef = useRef(null);
     const featuresRef = useRef(null);

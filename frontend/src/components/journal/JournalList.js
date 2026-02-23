@@ -16,10 +16,12 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { encryptedJournalService } from '../../services/encryptedJournalService'
 import JournaliteLoader from '../ui/JournaliteLoader';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 import { formatReadableDate } from '../../utils/taskUtils';
 
 const JournalList = () => {
+  useDocumentTitle('My Journal');
   const { currentUser } = useAuth();
   const [entries, setEntries] = useState([]);
   const [filteredEntries, setFilteredEntries] = useState([]);

@@ -18,6 +18,7 @@ import { encryptedJournalService } from '../../services/encryptedJournalService'
 import { analyticsService } from '../../services/analyticsService';
 import JournaliteLoader from '../ui/JournaliteLoader';
 import WritingThemePicker from './WritingThemePicker';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const JournalEntryForm = () => {
   const { currentUser } = useAuth();
@@ -47,6 +48,8 @@ const JournalEntryForm = () => {
   const [isEdit, setIsEdit] = useState(false); // Fixed typo and naming
   const [writingTheme, setWritingTheme] = useState(null);
   const [themeTransitioning, setThemeTransitioning] = useState(false);
+
+  useDocumentTitle(isEdit ? 'Edit Entry' : 'New Entry');
 
   const handleWritingThemeChange = (themeClassName) => {
     setWritingTheme(themeClassName);

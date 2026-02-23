@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const ForgotPasswordSchema = Yup.object().shape({
   email: Yup.string()
@@ -12,6 +13,7 @@ const ForgotPasswordSchema = Yup.object().shape({
 });
 
 const ForgotPassword = () => {
+  useDocumentTitle('Reset Password');
   const { resetPassword } = useAuth();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');

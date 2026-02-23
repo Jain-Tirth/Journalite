@@ -12,8 +12,10 @@ import WritingPatterns from './WritingPatterns';
 import MoodCorrelations from './MoodCorrelations';
 import { fieldEncryptionService } from '../../services/fieldEncryption';
 import JournaliteLoader from '../ui/JournaliteLoader';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const Insights = () => {
+  useDocumentTitle('Insights');
   const { currentUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -40,7 +42,7 @@ const Insights = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       // Clear cached analytics for fresh data
       if (currentUser?.uid) {
         analyticsService.clearCache(currentUser.uid);
@@ -202,43 +204,43 @@ const Insights = () => {
       <Row className="g-4">
         {/* Emotion Distribution */}
         <Col lg={6}>
-            <EmotionDistribution
-              data={insights.emotionDistribution}
-              loading={analyzing}
-            />
+          <EmotionDistribution
+            data={insights.emotionDistribution}
+            loading={analyzing}
+          />
 
         </Col>
 
         {/* Sentiment Analysis */}
         <Col lg={6}>
-            <SentimentAnalysis
-              data={insights.sentimentAnalysis}
-              loading={analyzing}
-            />
+          <SentimentAnalysis
+            data={insights.sentimentAnalysis}
+            loading={analyzing}
+          />
         </Col>
 
         {/* Emotions Over Time */}
         <Col lg={12}>
-            <EmotionsOverTime
-              data={insights.emotionsOverTime}
-              loading={analyzing}
-            />
+          <EmotionsOverTime
+            data={insights.emotionsOverTime}
+            loading={analyzing}
+          />
         </Col>
 
         {/* Writing Patterns */}
         <Col lg={12}>
-            <WritingPatterns
-              data={insights.writingPatterns}
-              loading={analyzing}
-            />
+          <WritingPatterns
+            data={insights.writingPatterns}
+            loading={analyzing}
+          />
         </Col>
 
         {/* Word Cloud - Full Width */}
         <Col lg={12}>
-            <WordCloud
-              data={insights.wordCloud}
-              loading={analyzing}
-            />
+          <WordCloud
+            data={insights.wordCloud}
+            loading={analyzing}
+          />
         </Col>
 
         {/* Mood Correlations */}

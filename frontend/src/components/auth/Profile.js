@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/firebaseAuth';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const ProfileSchema = Yup.object().shape({
   name: Yup.string()
@@ -21,6 +22,7 @@ const ProfileSchema = Yup.object().shape({
 });
 
 const Profile = () => {
+  useDocumentTitle('My Profile');
   const { currentUser } = useAuth();
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -32,18 +34,18 @@ const Profile = () => {
     try {
       setError('');
       setSuccess('');
-      
+
       // Only include password fields if the user is changing their password
       const userData = {
         name: values.name,
         email: values.email
       };
-      
+
       if (values.currentPassword && values.newPassword) {
         userData.currentPassword = values.currentPassword;
         userData.newPassword = values.newPassword;
       }
-      
+
       await authService.updateProfile(userData);
       setSuccess('Profile updated successfully!');
     } catch (err) {
@@ -62,7 +64,7 @@ const Profile = () => {
             <Card.Body>
               {error && <Alert variant="danger">{error}</Alert>}
               {success && <Alert variant="success">{success}</Alert>}
-              
+
               <Formik
                 initialValues={{
                   name: currentUser?.name || '',
@@ -189,9 +191,9 @@ const Profile = () => {
                     </Form.Group>
 
                     <div className="d-grid gap-2 mt-4">
-                      <Button 
-                        variant="primary" 
-                        type="submit" 
+                      <Button
+                        variant="primary"
+                        type="submit"
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? 'Saving...' : 'Save Changes'}

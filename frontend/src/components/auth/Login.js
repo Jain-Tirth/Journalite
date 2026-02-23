@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -15,6 +16,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
+  useDocumentTitle('Sign In');
   const { login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');

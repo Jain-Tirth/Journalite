@@ -15,6 +15,7 @@ import { useAuth } from '../../context/AuthContext';
 import { encryptedJournalService } from '../../services/encryptedJournalService';
 import { formatReadableDate } from '../../utils/taskUtils';
 import JournaliteLoader from '../ui/JournaliteLoader';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const JournalDetail = () => {
   const { id } = useParams();
@@ -26,6 +27,8 @@ const JournalDetail = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
+
+  useDocumentTitle(entry ? entry.title : 'Journal Entry');
 
   const moods = [
     { value: 'happy', emoji: '😊', color: 'success' },
@@ -178,8 +181,8 @@ const JournalDetail = () => {
                           src={imageUrl}
                           thumbnail
                           className="w-100 journal-image"
-                          style={{ 
-                            height: '150px', 
+                          style={{
+                            height: '150px',
                             objectFit: 'cover',
                             cursor: 'pointer'
                           }}
@@ -283,8 +286,8 @@ const JournalDetail = () => {
       </Modal>
 
       {/* Image Modal */}
-      <Modal 
-        show={showImageModal} 
+      <Modal
+        show={showImageModal}
         onHide={() => setShowImageModal(false)}
         size="lg"
         centered

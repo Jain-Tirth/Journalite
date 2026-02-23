@@ -5,8 +5,10 @@ import { journalService } from '../services/journalService';
 import { encryptedJournalService } from '../services/encryptedJournalService';
 import { formatReadableDate } from '../utils/taskUtils';
 import { useAuth } from '../context/AuthContext';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import JournaliteLoader from './ui/JournaliteLoader';
 const Dashboard = () => {
+  useDocumentTitle('Dashboard');
   const { currentUser } = useAuth();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);

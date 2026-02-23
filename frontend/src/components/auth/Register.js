@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const RegisterSchema = Yup.object().shape({
   name: Yup.string()
@@ -21,6 +22,7 @@ const RegisterSchema = Yup.object().shape({
 });
 
 const Register = () => {
+  useDocumentTitle('Create Account');
   const { register, login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
@@ -35,9 +37,9 @@ const Register = () => {
         email: values.email,
         password: values.password,
       });
-      
+
       setSuccess('Registration successful! Logging you in...');
-      
+
       // Auto login after successful registration
       setTimeout(async () => {
         try {
@@ -48,7 +50,7 @@ const Register = () => {
           navigate('/login');
         }
       }, 1500);
-      
+
       resetForm();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to register. Please try again.');
@@ -72,7 +74,7 @@ const Register = () => {
             <Card.Body>
               {error && <Alert variant="danger">{error}</Alert>}
               {success && <Alert variant="success">{success}</Alert>}
-              
+
               <Formik
                 initialValues={{ name: '', email: '', password: '', confirmPassword: '' }}
                 validationSchema={RegisterSchema}
@@ -121,9 +123,9 @@ const Register = () => {
                     </div>
 
                     <div className="d-grid gap-2">
-                      <Button 
-                        variant="primary" 
-                        type="submit" 
+                      <Button
+                        variant="primary"
+                        type="submit"
                         disabled={isSubmitting || success}
                       >
                         {isSubmitting ? 'Registering...' : 'Register'}
