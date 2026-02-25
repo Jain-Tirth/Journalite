@@ -28,6 +28,78 @@ main {
   --hover-bg: rgba(15, 118, 110, 0.06);
 }
 
+/* ===== Bootstrap Primary Color → Journalite Teal ===== */
+:root {
+  --bs-primary: #0f766e;
+  --bs-primary-rgb: 15, 118, 110;
+  --bs-link-color: #0f766e;
+  --bs-link-hover-color: #0b5f59;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+  border-color: #0f766e;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.25);
+  transition: all 0.25s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: linear-gradient(135deg, #0b5f59 0%, #0f766e 100%);
+  border-color: #0b5f59;
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  background: #0b5f59 !important;
+  border-color: #0b5f59 !important;
+  transform: translateY(0);
+}
+
+.btn-outline-primary {
+  color: #0f766e;
+  border-color: #0f766e;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+
+.btn-outline-info {
+  color: #0e7490;
+  border-color: #0e7490;
+}
+
+.btn-outline-info:hover {
+  background: #0e7490;
+  border-color: #0e7490;
+  color: #fff;
+}
+
+.badge.bg-primary {
+  background: linear-gradient(135deg, #0f766e, #0d9488) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 0.2rem rgba(15, 118, 110, 0.18);
+}
+
+a {
+  color: #0f766e;
+}
+
+a:hover {
+  color: #0b5f59;
+}
+
 [data-bs-theme="dark"] {
   /* Warm Dark Background - Deep Navy with Purple Undertones */
   --bs-body-bg: #1a1d29;
@@ -322,27 +394,20 @@ body {
   transition: all 0.2s ease;
 }
 
-/* Mobile menu button styles */
-.mobile-menu-btn {
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
-  left: calc(env(safe-area-inset-left, 0px) + 12px);
-  background: var(--bg-glass) !important;
-  border: 1px solid var(--border-light) !important;
-  color: var(--text-primary) !important;
-  box-shadow: 0 10px 30px rgba(31, 42, 46, 0.12);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+/* Mobile top bar styles */
+.mobile-top-bar {
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
+/* On small screens, no extra left padding needed anymore */
 @media (max-width: 576px) {
-  .mobile-menu-btn {
-    top: calc(env(safe-area-inset-top, 0px) + 10px);
-    left: calc(env(safe-area-inset-left, 0px) + 10px);
-  }
 
   .container,
   .container-fluid {
-    padding-left: calc(1rem + 32px);
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 
@@ -444,24 +509,24 @@ body {
     margin-bottom: 1rem;
   }
 
-  /* Mobile sidebar navigation - no top padding needed */
+  /* Mobile uses top bar navigation - no body padding needed */
   body {
     padding-top: 0 !important;
   }
 
-  /* Add top margin to main content for mobile menu button */
-  .container,
-  .container-fluid {
-    margin-top: 60px;
+  /* Offset content below the fixed 56px mobile top bar.
+     Applied to <main> so Bootstrap utility classes (mt-4 etc.)
+     on individual containers don't override this spacing. */
+  .App>main {
+    padding-top: 64px;
   }
 }
 
 @media (min-width: 992px) {
 
   /* Desktop navbar - ensure proper spacing */
-  .container,
-  .container-fluid {
-    margin-top: 0;
+  .App>main {
+    padding-top: 0;
   }
 }
 
@@ -503,6 +568,19 @@ body {
 
 .journal-entry-card {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+.journal-entry-card .card-header {
+  overflow: hidden;
+}
+
+@media (max-width: 400px) {
+  .journal-entry-card .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 4px !important;
+  }
 }
 
 .journal-entry-card:hover {
@@ -664,8 +742,9 @@ body {
 
 /* Modern Journalite Theme Overrides */
 .hero-section {
-  background: linear-gradient(135deg, var(--primary-blue-subtle) 0%, rgba(255, 255, 255, 0.8) 100%);
-  border-radius: var(--border-radius-lg);
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.08) 0%, rgba(255, 255, 255, 0.85) 100%);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid rgba(15, 118, 110, 0.1);
   padding: var(--spacing-2xl);
   margin-bottom: var(--spacing-xl);
 }
@@ -698,7 +777,7 @@ body {
 .feature-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-lg);
-  border-color: var(--primary-blue-light);
+  border-color: rgba(15, 118, 110, 0.3);
 }
 
 .stats-card {
@@ -785,7 +864,7 @@ body {
 }
 
 .navbar-brand-icon {
-  color: var(--primary-blue);
+  color: var(--primary, #0f766e);
   margin-right: var(--spacing-sm);
 }
 
@@ -799,12 +878,12 @@ body {
 }
 
 .journal-entry-card {
-  border-left: 4px solid var(--primary-blue);
+  border-left: 4px solid var(--primary, #0f766e);
   transition: all 0.2s ease;
 }
 
 .journal-entry-card:hover {
-  border-left-color: var(--primary-blue-dark);
+  border-left-color: var(--primary-hover, #0b5f59);
   box-shadow: var(--shadow-md);
 }
 
@@ -855,19 +934,22 @@ body {
 
 /* Auth Form Styling */
 .auth-form-card {
-  box-shadow: var(--shadow-lg);
-  border: none;
-  border-radius: var(--border-radius-lg);
+  box-shadow: 0 8px 32px rgba(31, 42, 46, 0.12);
+  border: 1px solid rgba(15, 118, 110, 0.08);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .auth-form-header {
-  background: linear-gradient(135deg, var(--primary-blue-subtle) 0%, rgba(255, 255, 255, 0.9) 100%);
-  border-bottom: 1px solid var(--border-color);
-  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.06) 0%, rgba(180, 83, 9, 0.04) 100%);
+  border-bottom: 1px solid var(--border-light, #e2d8cc);
+  border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0 !important;
 }
 
 .auth-brand-title {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1210,7 +1292,7 @@ body {
 
 /* Journal Entry Form Styling */
 .journal-form-header {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
   color: white;
   border-bottom: none;
 }

@@ -225,13 +225,13 @@ const JournalList = () => {
           {filteredEntries.map(entry => (
             <Col xxl={3} xl={4} lg={6} md={6} sm={12} key={entry.id} className="mb-4">
               <Card className="h-100 shadow-sm journal-entry-card">
-                <Card.Header className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex align-items-center">
+                <Card.Header className="d-flex justify-content-between align-items-center flex-wrap gap-1">
+                  <div className="d-flex align-items-center flex-shrink-0">
                     {entry.mood && (
                       <Badge
                         bg="primary"
                         className="me-2"
-                        style={{ fontSize: '0.9rem' }}
+                        style={{ fontSize: '0.85rem' }}
                       >
                         {getMoodEmoji(entry.mood)} {entry.mood}
                       </Badge>
@@ -242,7 +242,7 @@ const JournalList = () => {
                       </Badge>
                     )}
                   </div>
-                  <small className="text-muted">
+                  <small className="text-muted text-nowrap" style={{ fontSize: '0.78rem' }}>
                     {entry.createdAt ? formatReadableDate(entry.createdAt) : 'No date'}
                   </small>
                 </Card.Header>

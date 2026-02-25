@@ -30,21 +30,50 @@ const Navbar = () => {
     return currentUser?.role === 'admin' || false;
   };
 
-  // Mobile Menu Button (Hamburger) - Only visible on mobile
-  const MobileMenuButton = () => (
-    <Button
-      variant="link"
-      className="position-fixed d-lg-none mobile-menu-btn"
+  // Mobile Top Bar - Proper header instead of floating hamburger
+  const MobileTopBar = () => (
+    <div
+      className="d-lg-none mobile-top-bar"
       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
         zIndex: 1040,
-        border: 'none',
-        padding: '8px',
-        borderRadius: '10px'
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 16px',
+        height: '56px',
+        background: 'rgba(253, 250, 246, 0.92)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        borderBottom: '1px solid var(--border-light, #e2d8cc)',
+        boxShadow: '0 1px 8px rgba(31, 42, 46, 0.06)'
       }}
-      onClick={handleShowSidebar}
     >
-      <i className="bi bi-list fs-4 text-primary"></i>
-    </Button>
+      <button
+        className="btn btn-link p-0 border-0"
+        onClick={handleShowSidebar}
+        aria-label="Open menu"
+        style={{ lineHeight: 1 }}
+      >
+        <i className="bi bi-list" style={{ fontSize: '1.5rem', color: 'var(--primary, #0f766e)' }}></i>
+      </button>
+      <div className="d-flex align-items-center">
+        <i className="bi bi-journal-bookmark me-2" style={{ color: 'var(--primary, #0f766e)', fontSize: '1.2rem' }}></i>
+        <span style={{ fontFamily: 'var(--font-family-display, Fraunces, serif)', fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary, #1f2a2e)' }}>
+          Journalite
+        </span>
+      </div>
+      {currentUser ? (
+        <Link to="/profile" className="btn btn-link p-0 border-0" style={{ lineHeight: 1 }}>
+          <i className="bi bi-person-circle" style={{ fontSize: '1.4rem', color: 'var(--text-secondary, #435257)' }}></i>
+        </Link>
+      ) : (
+        <div style={{ width: '24px' }}></div>
+      )}
+    </div>
   );
 
   // Desktop/Tablet Horizontal Navbar
@@ -175,13 +204,6 @@ const Navbar = () => {
               isActive={isActive('/insights')}
               onClick={onItemClick}
             />
-            <NavItem
-              to="/profile"
-              icon="bi-person"
-              label="Profile"
-              isActive={isActive('/profile')}
-              onClick={onItemClick}
-            />
             {checkIsAdmin() && (
               <NavItem
                 to="/admin"
@@ -278,8 +300,8 @@ const Navbar = () => {
       {/* Desktop/Tablet Horizontal Navbar */}
       <DesktopNavbar />
 
-      {/* Mobile Menu Button - Only visible on mobile */}
-      <MobileMenuButton />
+      {/* Mobile Top Bar - Only visible on mobile */}
+      <MobileTopBar />
 
       {/* Mobile Sidebar (Offcanvas) - Only visible on mobile */}
       <Offcanvas
