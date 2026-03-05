@@ -1,5 +1,8 @@
 {
   "hosting": {
+    "predeploy": [
+      "npm --prefix frontend run build"
+    ],
     "public": "frontend/build",
     "site": "journalite-a1327",
     "ignore": [
