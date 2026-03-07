@@ -13,7 +13,7 @@ npm install
 Create a `.env` file with the following variables:
 
 ```
-REACT_APP_GEMINI_API_KEY=your-gemini-api-key
+REACT_APP_GROQ_API_KEY=your-groq-api-key
 REACT_APP_PYTHON_API_URL=http://localhost:8080
 ```
 
